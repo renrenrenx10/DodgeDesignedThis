@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Admin Orders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--grey); color:var(--ink); font-family:'Oswald',sans-serif; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 24px;}
+
+  header{background:#000; border-bottom:2px solid #000;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:16px 0; flex-wrap:wrap; gap:16px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand img{height:38px;}
+  .brand .tag{color:#fff; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;}
+  nav{display:flex; gap:22px; flex-wrap:wrap;}
+  nav a{font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#bbb; border-bottom:2px solid transparent; padding-bottom:2px;}
+  nav a.current{color:#fff; border-color:#fff;}
+  nav a:hover{color:#fff;}
+  .signout{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#bbb; border:1px solid #444; padding:6px 12px; background:none; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .signout:hover{color:#fff; border-color:#888;}
+
+  main{padding:40px 0 60px;}
+  h1{font-size:26px; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 24px;}
+
+  .order-card{background:#fff; border:2px solid var(--ink); margin-bottom:20px;}
+  .order-head{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid #ddd; flex-wrap:wrap; gap:12px; cursor:pointer;}
+  .order-head .who{font-size:14px; font-weight:600;}
+  .order-head .when{font-size:11px; color:var(--mid); text-transform:none;}
+  .pill{display:inline-block; font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; padding:4px 10px; border:1px solid var(--ink);}
+  .pill.paid{background:#1e7e34; color:#fff; border-color:#1e7e34;}
+  .pill.fulfilled{background:var(--ink); color:#fff;}
+  .pill.pending{color:var(--mid);}
+  .pill.cancelled{color:#c0392b; border-color:#c0392b;}
+  .order-total{font-weight:700; font-size:14px;}
+
+  .order-body{padding:18px 20px; display:none; border-bottom:1px solid #ddd;}
+  .order-card.open .order-body{display:block;}
+  .order-body .cols{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
+  .order-body h4{font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--mid); margin:0 0 8px;}
+  .order-body address{font-size:13px; line-height:1.6; font-style:normal; text-transform:none;}
+  .items-list{list-style:none; margin:0; padding:0; font-size:13px;}
+  .items-list li{padding:6px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between;}
+  .items-list li:last-child{border-bottom:none;}
+
+  .status-row{padding:14px 20px; display:flex; align-items:center; gap:10px;}
+  .status-row label{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--mid);}
+  .status-row select{border:2px solid var(--ink); padding:6px 10px; font-family:'Oswald',sans-serif; font-size:12px;}
+
+  .empty, .loading{padding:24px; color:var(--mid); font-size:13px; text-transform:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><img src="../img/brand/logo.jpg" alt="Dodge Designed This" /><span class="tag">Admin</span></div>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="products.html">Products</a>
+      <a href="orders.html" class="current">Orders</a>
+      <a href="settings.html">Settings</a>
+      <a href="../index.html">View Shop</a>
+    </nav>
+    <button class="signout" id="signout-btn">Sign Out</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Orders</h1>
+  <div id="order-list"><div class="loading">Loading…</div></div>
+</main>
+
+<script type="module">
+  import { requireSession, signOut } from "../assets/js/admin-auth.js";
+  import { supabase } from "../assets/js/supabase-client.js";
+  import { formatPrice } from "../assets/js/shop.js";
+
+  await requireSession();
+  document.getElementById("signout-btn").addEventListener("click", signOut);
+
+  const list = document.getElementById("order-list");
+
+  const { data: orders, error } = await supabase
+    .from("orders")
+    .select("*, order_items(*)")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    list.innerHTML = `<div class="empty">Couldn't load orders: ${escapeHTML(error.message)}</div>`;
+  } else if (!orders || orders.length === 0) {
+    list.innerHTML = `<div class="empty">No orders yet.</div>`;
+  } else {
+    list.innerHTML = orders.map((o) => orderCardHTML(o)).join("");
+
+    list.querySelectorAll(".order-head").forEach((head) =>
+      head.addEventListener("click", () => head.closest(".order-card").classList.toggle("open")),
+    );
+
+    list.querySelectorAll(".status-select").forEach((sel) =>
+      sel.addEventListener("change", async () => {
+        const id = sel.dataset.orderId;
+        const { error: upErr } = await supabase.from("orders").update({ status: sel.value }).eq("id", id);
+        if (upErr) alert("Couldn't update status: " + upErr.message);
+      }),
+    );
+  }
+
+  function orderCardHTML(o) {
+    const addr = o.shipping_address || {};
+    const addrLines = [addr.line1, addr.line2, addr.city, addr.postal_code, addr.country]
+      .filter(Boolean)
+      .map(escapeHTML)
+      .join("<br>");
+
+    return `
+      <div class="order-card">
+        <div class="order-head">
+          <div>
+            <div class="who">${escapeHTML(o.customer_name || o.email)}</div>
+            <div class="when">${new Date(o.created_at).toLocaleString("en-GB")}</div>
+          </div>
+          <span class="pill ${escapeHTML(o.status)}">${escapeHTML(o.status)}</span>
+          <div class="order-total">${formatPrice(o.total_pence)}</div>
+        </div>
+        <div class="order-body">
+          <div class="cols">
+            <div>
+              <h4>Items</h4>
+              <ul class="items-list">
+                ${(o.order_items || [])
+                  .map(
+                    (it) => `
+                  <li><span>${it.qty}&times; ${escapeHTML(it.title)}${it.size ? ` (${escapeHTML(it.size)}${it.colour ? ", " + escapeHTML(it.colour) : ""})` : ""}</span><span>${formatPrice(it.unit_price_pence * it.qty)}</span></li>`,
+                  )
+                  .join("")}
+              </ul>
+            </div>
+            <div>
+              <h4>Shipping Address</h4>
+              <address>${escapeHTML(o.email)}<br>${addrLines || "No address on file"}</address>
+            </div>
+          </div>
+        </div>
+        <div class="status-row">
+          <label for="status-${o.id}">Status</label>
+          <select id="status-${o.id}" class="status-select" data-order-id="${o.id}">
+            <option value="pending" ${o.status === "pending" ? "selected" : ""}>Pending</option>
+            <option value="paid" ${o.status === "paid" ? "selected" : ""}>Paid</option>
+            <option value="fulfilled" ${o.status === "fulfilled" ? "selected" : ""}>Fulfilled</option>
+            <option value="cancelled" ${o.status === "cancelled" ? "selected" : ""}>Cancelled</option>
+          </select>
+        </div>
+      </div>`;
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str ?? "";
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>

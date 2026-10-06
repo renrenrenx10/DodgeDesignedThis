@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Admin Products</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--grey); color:var(--ink); font-family:'Oswald',sans-serif; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 24px;}
+
+  header{background:#000; border-bottom:2px solid #000;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:16px 0; flex-wrap:wrap; gap:16px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand img{height:38px;}
+  .brand .tag{color:#fff; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;}
+  nav{display:flex; gap:22px; flex-wrap:wrap;}
+  nav a{font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#bbb; border-bottom:2px solid transparent; padding-bottom:2px;}
+  nav a.current{color:#fff; border-color:#fff;}
+  nav a:hover{color:#fff;}
+  .signout{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#bbb; border:1px solid #444; padding:6px 12px; background:none; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .signout:hover{color:#fff; border-color:#888;}
+
+  main{padding:40px 0 60px;}
+  .headrow{display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:14px;}
+  h1{font-size:26px; text-transform:uppercase; letter-spacing:0.5px; margin:0;}
+  .addbtn{font-weight:700; font-size:12px; letter-spacing:1px; text-transform:uppercase; padding:11px 20px; border:2px solid var(--ink); background:var(--ink); color:#fff;}
+
+  .filters{display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
+  .chip{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px solid var(--ink); padding:7px 14px; background:#fff; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .chip.active{background:var(--ink); color:#fff;}
+
+  table{width:100%; border-collapse:collapse; background:#fff; border:2px solid var(--ink); font-size:13px;}
+  th, td{text-align:left; padding:12px 16px; border-bottom:1px solid #ddd;}
+  th{font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:var(--mid);}
+  tr:last-child td{border-bottom:none;}
+  tr.inactive{opacity:0.5;}
+  .pill{display:inline-block; font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; padding:3px 8px; border:1px solid var(--ink);}
+  .pill.live{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .pill.low{border-color:#c0392b; color:#c0392b;}
+  .row-edit{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; text-decoration:underline;}
+  .loading, .empty{padding:24px; color:var(--mid); font-size:13px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><img src="../img/brand/logo.jpg" alt="Dodge Designed This" /><span class="tag">Admin</span></div>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="products.html" class="current">Products</a>
+      <a href="orders.html">Orders</a>
+      <a href="settings.html">Settings</a>
+      <a href="../index.html">View Shop</a>
+    </nav>
+    <button class="signout" id="signout-btn">Sign Out</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="headrow">
+    <h1>Products</h1>
+    <a class="addbtn" href="product-edit.html">+ Add Product</a>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="chip active" data-cat="all">All</button>
+    <button class="chip" data-cat="tees">Tees</button>
+    <button class="chip" data-cat="hoodies-sweats">Hoodies &amp; Sweats</button>
+    <button class="chip" data-cat="caps">Caps</button>
+    <button class="chip" data-cat="out-the-bin">Out The Bin</button>
+    <button class="chip" data-cat="band-print-bundles">Band Print Bundles</button>
+  </div>
+
+  <table id="product-table">
+    <thead>
+      <tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody id="product-body">
+      <tr><td colspan="6" class="loading">Loading…</td></tr>
+    </tbody>
+  </table>
+</main>
+
+<script type="module">
+  import { requireSession, signOut } from "../assets/js/admin-auth.js";
+  import { supabase } from "../assets/js/supabase-client.js";
+  import { formatPrice } from "../assets/js/shop.js";
+
+  await requireSession();
+  document.getElementById("signout-btn").addEventListener("click", signOut);
+
+  const { data: products, error } = await supabase
+    .from("products")
+    .select("id, slug, title, category, price_pence, active, sort_order, variants(stock)")
+    .order("category", { ascending: true })
+    .order("sort_order", { ascending: true });
+
+  const body = document.getElementById("product-body");
+
+  if (error) {
+    body.innerHTML = `<tr><td colspan="6" class="empty">Couldn't load products: ${escapeHTML(error.message)}</td></tr>`;
+  } else {
+    render(products, "all");
+  }
+
+  document.getElementById("filters").addEventListener("click", (e) => {
+    const btn = e.target.closest(".chip");
+    if (!btn) return;
+    document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+    btn.classList.add("active");
+    render(products, btn.dataset.cat);
+  });
+
+  function render(list, cat) {
+    const filtered = cat === "all" ? list : list.filter((p) => p.category === cat);
+    if (filtered.length === 0) {
+      body.innerHTML = `<tr><td colspan="6" class="empty">No products in this category yet.</td></tr>`;
+      return;
+    }
+    body.innerHTML = filtered
+      .map((p) => {
+        const totalStock = (p.variants || []).reduce((s, v) => s + (v.stock || 0), 0);
+        const lowest = (p.variants || []).length
+          ? Math.min(...p.variants.map((v) => v.stock))
+          : null;
+        return `
+        <tr class="${p.active ? "" : "inactive"}">
+          <td>${escapeHTML(p.title)}</td>
+          <td>${escapeHTML(categoryLabel(p.category))}</td>
+          <td>${formatPrice(p.price_pence)}</td>
+          <td>${totalStock}${lowest !== null && lowest <= 2 ? ' <span class="pill low">Low</span>' : ""}</td>
+          <td><span class="pill ${p.active ? "live" : ""}">${p.active ? "Live" : "Hidden"}</span></td>
+          <td><a class="row-edit" href="product-edit.html?id=${p.id}">Edit</a></td>
+        </tr>`;
+      })
+      .join("");
+  }
+
+  function categoryLabel(cat) {
+    return (
+      {
+        tees: "Tees",
+        "hoodies-sweats": "Hoodies & Sweats",
+        caps: "Caps",
+        "out-the-bin": "Out The Bin",
+        "band-print-bundles": "Band Print Bundles",
+      }[cat] || cat
+    );
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str ?? "";
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>

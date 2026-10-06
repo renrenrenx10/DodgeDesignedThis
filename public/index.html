@@ -136,15 +136,15 @@
 <section class="cat-tiles wrap">
   <div class="grid">
     <a class="cat-tile" href="tees.html">
-      <img src="img/categories/tees.jpg" alt="Tees" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'Add img/categories/tees.jpg'}))" />
+      <img id="tile-tees" src="img/categories/tees.jpg" alt="Tees" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'Add img/categories/tees.jpg'}))" />
       <div class="overlay"><div class="label">Tees</div></div>
     </a>
     <a class="cat-tile" href="hoodies-sweats.html">
-      <img src="img/categories/hoodies-sweats.jpg" alt="Hoodies &amp; Sweats" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'Add img/categories/hoodies-sweats.jpg'}))" />
+      <img id="tile-hoodies-sweats" src="img/categories/hoodies-sweats.jpg" alt="Hoodies &amp; Sweats" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'Add img/categories/hoodies-sweats.jpg'}))" />
       <div class="overlay"><div class="label">Hoods &amp; Sweats</div></div>
     </a>
     <a class="cat-tile" href="caps.html">
-      <img src="img/categories/caps.jpg" alt="Caps" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'Add img/categories/caps.jpg'}))" />
+      <img id="tile-caps" src="img/categories/caps.jpg" alt="Caps" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'Add img/categories/caps.jpg'}))" />
       <div class="overlay"><div class="label">Caps</div></div>
     </a>
   </div>
@@ -216,6 +216,7 @@
 
 <script type="module">
   import { getActiveProducts, productCardHTML } from "./assets/js/shop.js";
+  import { supabase } from "./assets/js/supabase-client.js";
 
   (async function(){
     const shelf = document.getElementById('rail-shelf');
@@ -225,6 +226,24 @@
       return;
     }
     shelf.innerHTML = products.map(p => productCardHTML(p)).join('');
+  })();
+
+  // Homepage category tiles — if the admin has uploaded a custom photo via
+  // Admin > Settings, swap it in over the default static file. Falls back
+  // silently to whatever's already in the <img src> (the static file, or
+  // its own placeholder) if site_settings isn't reachable or empty.
+  (async function(){
+    const { data } = await supabase
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['category_tile_tees', 'category_tile_hoodies-sweats', 'category_tile_caps']);
+    if (!data) return;
+    const map = { 'category_tile_tees': 'tile-tees', 'category_tile_hoodies-sweats': 'tile-hoodies-sweats', 'category_tile_caps': 'tile-caps' };
+    data.forEach((row) => {
+      if (!row.value) return;
+      const img = document.getElementById(map[row.key]);
+      if (img) img.src = row.value;
+    });
   })();
 </script>
 

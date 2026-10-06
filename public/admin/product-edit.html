@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Edit Product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--grey); color:var(--ink); font-family:'Oswald',sans-serif; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 24px;}
+
+  header{background:#000; border-bottom:2px solid #000;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:16px 0; flex-wrap:wrap; gap:16px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand img{height:38px;}
+  .brand .tag{color:#fff; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;}
+  nav{display:flex; gap:22px; flex-wrap:wrap;}
+  nav a{font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#bbb; border-bottom:2px solid transparent; padding-bottom:2px;}
+  nav a.current{color:#fff; border-color:#fff;}
+  nav a:hover{color:#fff;}
+  .signout{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#bbb; border:1px solid #444; padding:6px 12px; background:none; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .signout:hover{color:#fff; border-color:#888;}
+
+  main{padding:40px 0 80px;}
+  .headrow{display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:14px;}
+  h1{font-size:26px; text-transform:uppercase; letter-spacing:0.5px; margin:0;}
+  .back{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; text-decoration:underline;}
+
+  .card{background:#fff; border:2px solid var(--ink); padding:28px; margin-bottom:24px;}
+  .card h2{font-size:14px; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 20px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  label{display:block; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; color:var(--mid);}
+  input, select, textarea{width:100%; border:2px solid var(--ink); padding:10px 12px; font-family:'Oswald',sans-serif; font-size:13px; background:#fff; color:var(--ink); margin-bottom:16px;}
+  textarea{min-height:80px; resize:vertical;}
+  .field-note{font-size:11px; color:var(--mid); margin:-12px 0 16px;}
+  .checkrow{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .checkrow input{width:auto; margin:0;}
+  .checkrow label{margin:0;}
+
+  .variant-row{display:grid; grid-template-columns:1fr 1fr 1fr 90px 36px; gap:10px; align-items:center; margin-bottom:10px;}
+  .variant-row input{margin-bottom:0;}
+  .variant-row .remove{width:36px; height:36px; border:2px solid var(--ink); background:#fff; cursor:pointer; font-weight:700; font-size:16px; line-height:1;}
+  .addvariant{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px dashed var(--mid); background:none; padding:10px; width:100%; cursor:pointer; font-family:'Oswald',sans-serif; margin-top:6px;}
+
+  .photo-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px;}
+  .photo-grid .thumb{position:relative; aspect-ratio:1/1; background:var(--grey); border:2px solid var(--ink); overflow:hidden;}
+  .photo-grid .thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .photo-grid .thumb .rm{position:absolute; top:4px; right:4px; width:24px; height:24px; background:#000; color:#fff; border:none; font-weight:700; cursor:pointer;}
+  .upload-btn{display:inline-block; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px solid var(--ink); padding:10px 16px; cursor:pointer;}
+  .upload-btn input{display:none;}
+
+  .savebar{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+  .save-btn{font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; padding:14px 30px; border:2px solid var(--ink); background:var(--ink); color:#fff; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .save-btn:disabled{opacity:0.5; cursor:default;}
+  .save-msg{font-size:12px; color:var(--mid); text-transform:none;}
+  .save-msg.ok{color:#1e7e34;}
+  .save-msg.err{color:#c0392b;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><img src="../img/brand/logo.jpg" alt="Dodge Designed This" /><span class="tag">Admin</span></div>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="products.html" class="current">Products</a>
+      <a href="orders.html">Orders</a>
+      <a href="settings.html">Settings</a>
+      <a href="../index.html">View Shop</a>
+    </nav>
+    <button class="signout" id="signout-btn">Sign Out</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="headrow">
+    <h1 id="page-title">Add Product</h1>
+    <a class="back" href="products.html">&larr; Back to Products</a>
+  </div>
+
+  <form id="product-form">
+    <div class="card">
+      <h2>Details</h2>
+      <div class="grid2">
+        <div>
+          <label for="title">Title</label>
+          <input id="title" required />
+        </div>
+        <div>
+          <label for="slug">URL Slug</label>
+          <input id="slug" required pattern="[a-z0-9\-]+" />
+        </div>
+      </div>
+      <div class="field-note">Slug is used in the product URL and can't be changed after the page is shared around — lowercase, numbers and hyphens only.</div>
+
+      <div class="grid2">
+        <div>
+          <label for="category">Category</label>
+          <select id="category" required>
+            <option value="tees">Tees</option>
+            <option value="hoodies-sweats">Hoodies &amp; Sweats</option>
+            <option value="caps">Caps</option>
+            <option value="out-the-bin">Out The Bin</option>
+            <option value="band-print-bundles">Band Print Bundles</option>
+          </select>
+        </div>
+        <div>
+          <label for="tag">Tag</label>
+          <input id="tag" placeholder="e.g. Tees — Screen Printed" />
+        </div>
+      </div>
+
+      <label for="blurb">Blurb</label>
+      <textarea id="blurb" placeholder="Short product description shown on the product page"></textarea>
+
+      <label for="boilerplate">Category Boilerplate</label>
+      <textarea id="boilerplate" placeholder="e.g. the shipping/returns/sizing paragraph for this category"></textarea>
+
+      <div class="grid2">
+        <div>
+          <label for="price">Price (£)</label>
+          <input id="price" type="number" step="0.01" min="0" required />
+        </div>
+        <div>
+          <label for="gig-price">Gig Price (£, optional)</label>
+          <input id="gig-price" type="number" step="0.01" min="0" />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label for="sort-order">Sort Order</label>
+          <input id="sort-order" type="number" step="1" value="0" />
+        </div>
+        <div style="padding-top:28px;">
+          <div class="checkrow">
+            <input type="checkbox" id="active" checked />
+            <label for="active">Live on the shop</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Photos</h2>
+      <div class="photo-grid" id="photo-grid"></div>
+      <label class="upload-btn">
+        + Upload Photo
+        <input type="file" id="photo-input" accept="image/*" multiple />
+      </label>
+      <div class="field-note" style="margin-top:10px;">JPG, PNG or WEBP. Uploads need a saved product first — save the details above once, then add photos.</div>
+    </div>
+
+    <div class="card">
+      <h2>Sizes, Colours &amp; Stock</h2>
+      <div id="variant-rows"></div>
+      <button type="button" class="addvariant" id="add-variant">+ Add Size / Colour</button>
+    </div>
+
+    <div class="card savebar">
+      <button type="submit" class="save-btn" id="save-btn">Save Product</button>
+      <span class="save-msg" id="save-msg"></span>
+    </div>
+  </form>
+</main>
+
+<script type="module">
+  import { requireSession, signOut } from "../assets/js/admin-auth.js";
+  import { supabase } from "../assets/js/supabase-client.js";
+
+  await requireSession();
+  document.getElementById("signout-btn").addEventListener("click", signOut);
+
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get("id");
+
+  const els = {
+    title: document.getElementById("title"),
+    slug: document.getElementById("slug"),
+    category: document.getElementById("category"),
+    tag: document.getElementById("tag"),
+    blurb: document.getElementById("blurb"),
+    boilerplate: document.getElementById("boilerplate"),
+    price: document.getElementById("price"),
+    gigPrice: document.getElementById("gig-price"),
+    sortOrder: document.getElementById("sort-order"),
+    active: document.getElementById("active"),
+  };
+
+  let images = []; // { id?, url, alt, sort_order }
+  let originalVariants = []; // variants as loaded, so we can tell what was removed
+  const variantRows = document.getElementById("variant-rows");
+  const photoGrid = document.getElementById("photo-grid");
+  const saveMsg = document.getElementById("save-msg");
+  const saveBtn = document.getElementById("save-btn");
+
+  if (productId) {
+    document.getElementById("page-title").textContent = "Edit Product";
+    const { data: product, error } = await supabase
+      .from("products")
+      .select("*, variants(*), product_images(*)")
+      .eq("id", productId)
+      .single();
+
+    if (error || !product) {
+      saveMsg.textContent = "Couldn't load this product.";
+      saveMsg.className = "save-msg err";
+    } else {
+      els.title.value = product.title || "";
+      els.slug.value = product.slug || "";
+      els.category.value = product.category || "tees";
+      els.tag.value = product.tag || "";
+      els.blurb.value = product.blurb || "";
+      els.boilerplate.value = product.boilerplate || "";
+      els.price.value = (product.price_pence / 100).toFixed(2);
+      els.gigPrice.value = product.gig_price_pence ? (product.gig_price_pence / 100).toFixed(2) : "";
+      els.sortOrder.value = product.sort_order || 0;
+      els.active.checked = product.active;
+
+      images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
+      originalVariants = product.variants || [];
+      originalVariants.forEach((v) => addVariantRow(v));
+    }
+  } else {
+    addVariantRow();
+  }
+
+  renderPhotoGrid();
+
+  document.getElementById("add-variant").addEventListener("click", () => addVariantRow());
+
+  function addVariantRow(variant) {
+    const row = document.createElement("div");
+    row.className = "variant-row";
+    row.innerHTML = `
+      <input placeholder="Size (e.g. M)" class="v-size" value="${escapeAttr(variant?.size)}" required />
+      <input placeholder="Colour (e.g. Black)" class="v-colour" value="${escapeAttr(variant?.colour)}" required />
+      <input placeholder="Colour Hex (#000)" class="v-hex" value="${escapeAttr(variant?.colour_hex)}" />
+      <input type="number" min="0" step="1" placeholder="Stock" class="v-stock" value="${variant?.stock ?? 0}" required />
+      <button type="button" class="remove" title="Remove">&times;</button>
+    `;
+    row.dataset.variantId = variant?.id || "";
+    row.querySelector(".remove").addEventListener("click", () => row.remove());
+    variantRows.appendChild(row);
+  }
+
+  document.getElementById("photo-input").addEventListener("change", async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    if (!productId) {
+      saveMsg.textContent = "Save the product first, then add photos.";
+      saveMsg.className = "save-msg err";
+      e.target.value = "";
+      return;
+    }
+
+    saveMsg.textContent = "Uploading…";
+    saveMsg.className = "save-msg";
+
+    const slug = els.slug.value.trim();
+    for (const file of files) {
+      const ext = file.name.split(".").pop();
+      const path = `products/${slug}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("site-assets").upload(path, file);
+      if (upErr) {
+        saveMsg.textContent = `Upload failed: ${upErr.message}`;
+        saveMsg.className = "save-msg err";
+        continue;
+      }
+      const { data: pub } = supabase.storage.from("site-assets").getPublicUrl(path);
+      const sortOrder = images.length;
+      const { data: row, error: insErr } = await supabase
+        .from("product_images")
+        .insert({ product_id: productId, url: pub.publicUrl, alt: els.title.value, sort_order: sortOrder })
+        .select()
+        .single();
+      if (!insErr) images.push(row);
+    }
+
+    saveMsg.textContent = "Photos uploaded.";
+    saveMsg.className = "save-msg ok";
+    e.target.value = "";
+    renderPhotoGrid();
+  });
+
+  function renderPhotoGrid() {
+    photoGrid.innerHTML = images
+      .map(
+        (img, i) => `
+      <div class="thumb" data-idx="${i}">
+        <img src="${escapeAttr(img.url)}" alt="" />
+        <button type="button" class="rm" data-idx="${i}">&times;</button>
+      </div>`,
+      )
+      .join("");
+    photoGrid.querySelectorAll(".rm").forEach((btn) =>
+      btn.addEventListener("click", async () => {
+        const idx = Number(btn.dataset.idx);
+        const img = images[idx];
+        if (img.id) await supabase.from("product_images").delete().eq("id", img.id);
+        images.splice(idx, 1);
+        renderPhotoGrid();
+      }),
+    );
+  }
+
+  document.getElementById("product-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    saveBtn.disabled = true;
+    saveMsg.textContent = "Saving…";
+    saveMsg.className = "save-msg";
+
+    const payload = {
+      title: els.title.value.trim(),
+      slug: els.slug.value.trim(),
+      category: els.category.value,
+      tag: els.tag.value.trim() || null,
+      blurb: els.blurb.value.trim() || null,
+      boilerplate: els.boilerplate.value.trim() || null,
+      price_pence: Math.round(parseFloat(els.price.value) * 100),
+      gig_price_pence: els.gigPrice.value ? Math.round(parseFloat(els.gigPrice.value) * 100) : null,
+      sort_order: parseInt(els.sortOrder.value, 10) || 0,
+      active: els.active.checked,
+    };
+
+    let savedId = productId;
+    let saveErr = null;
+
+    if (productId) {
+      const { error } = await supabase.from("products").update(payload).eq("id", productId);
+      saveErr = error;
+    } else {
+      const { data, error } = await supabase.from("products").insert(payload).select().single();
+      saveErr = error;
+      if (data) savedId = data.id;
+    }
+
+    if (saveErr) {
+      saveMsg.textContent = `Couldn't save: ${saveErr.message}`;
+      saveMsg.className = "save-msg err";
+      saveBtn.disabled = false;
+      return;
+    }
+
+    // Upsert each size/colour row rather than delete-and-reinsert — a
+    // variant that's already been ordered can't be deleted (order_items
+    // references it), so we upsert on (product_id, size, colour) and only
+    // try to delete rows the admin actually removed from the form.
+    const rows = Array.from(variantRows.children).map((row) => ({
+      product_id: savedId,
+      size: row.querySelector(".v-size").value.trim(),
+      colour: row.querySelector(".v-colour").value.trim(),
+      colour_hex: row.querySelector(".v-hex").value.trim() || null,
+      stock: parseInt(row.querySelector(".v-stock").value, 10) || 0,
+    }));
+
+    let variantWarning = "";
+
+    if (rows.length > 0) {
+      const { error: vErr } = await supabase
+        .from("variants")
+        .upsert(rows, { onConflict: "product_id,size,colour" });
+      if (vErr) {
+        saveMsg.textContent = `Product saved, but sizes/stock failed: ${vErr.message}`;
+        saveMsg.className = "save-msg err";
+        saveBtn.disabled = false;
+        return;
+      }
+    }
+
+    const keptKeys = new Set(rows.map((r) => `${r.size}|||${r.colour}`));
+    const removed = originalVariants.filter((v) => !keptKeys.has(`${v.size}|||${v.colour}`));
+    for (const v of removed) {
+      const { error: delErr } = await supabase.from("variants").delete().eq("id", v.id);
+      if (delErr) {
+        // Almost certainly referenced by a past order — can't delete it,
+        // so zero its stock instead so it drops off the shop silently.
+        await supabase.from("variants").update({ stock: 0 }).eq("id", v.id);
+        variantWarning = " (a removed size/colour had past orders, so it was kept at 0 stock instead of deleted)";
+      }
+    }
+
+    saveMsg.textContent = `Saved.${variantWarning}`;
+    saveMsg.className = variantWarning ? "save-msg" : "save-msg ok";
+    saveBtn.disabled = false;
+
+    if (!productId) {
+      window.location.href = `product-edit.html?id=${savedId}`;
+    }
+  });
+
+  function escapeAttr(str) {
+    const div = document.createElement("div");
+    div.textContent = str ?? "";
+    return div.innerHTML.replace(/"/g, "&quot;");
+  }
+</script>
+
+</body>
+</html>
