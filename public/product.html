@@ -137,7 +137,8 @@
     crumb.innerHTML = `<a href="index.html">Home</a> / <a href="${product.category}.html">${esc(product.category.replace('-', ' '))}</a> / ${esc(product.title)}`;
 
     const colours = [...new Map(product.variants.map(v => [v.colour, v])).values()];
-    const sizesOrder = ['XS','S','M','L','XL','2XL'];
+    const sizesOrder = ['One Size','XS','S','M','L','XL','2XL','3XL'];
+    const image = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order)[0];
 
     let selectedColour = colours[0]?.colour ?? null;
 
@@ -149,7 +150,9 @@
       const sizesForColour = sizesOrder.filter(s => product.variants.some(v => v.size === s && v.colour === selectedColour));
       root.innerHTML = `
         <div class="gallery">
-          <div class="main-shot"><div class="ph">${esc(product.title)}<br/>(photo coming soon)</div></div>
+          <div class="main-shot">${image
+            ? `<img src="${esc(image.url)}" alt="${esc(image.alt || product.title)}" style="width:100%; height:100%; object-fit:cover;" />`
+            : `<div class="ph">${esc(product.title)}<br/>(photo coming soon)</div>`}</div>
         </div>
         <div class="pd-info">
           <div class="pd-tag">${esc(product.tag || '')}</div>

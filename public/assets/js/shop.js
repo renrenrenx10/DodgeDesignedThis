@@ -11,7 +11,7 @@ export function formatPrice(pence) {
 export async function getActiveProducts({ category, limit } = {}) {
   let query = supabase
     .from("products")
-    .select("*, variants(*)")
+    .select("*, variants(*), product_images(*)")
     .eq("active", true)
     .order("sort_order", { ascending: true });
 
@@ -29,7 +29,7 @@ export async function getActiveProducts({ category, limit } = {}) {
 export async function getProductBySlug(slug) {
   const { data, error } = await supabase
     .from("products")
-    .select("*, variants(*)")
+    .select("*, variants(*), product_images(*)")
     .eq("slug", slug)
     .eq("active", true)
     .single();
@@ -50,11 +50,21 @@ export function productCardHTML(product, { showGig = true } = {}) {
     : "";
   return `
     <a class="card" href="product.html?slug=${encodeURIComponent(product.slug)}">
-      <div class="imgwrap"><div class="ph">${escapeHTML(product.title)}</div></div>
+      <div class="imgwrap">${productImageHTML(product)}</div>
       <h3>${escapeHTML(product.title)}</h3>
       <div class="price">${formatPrice(product.price_pence)}${gig}</div>
     </a>
   `;
+}
+
+// Renders a real photo if the product has one (product_images row), otherwise
+// the placeholder box used everywhere until photography is in.
+export function productImageHTML(product) {
+  const image = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order)[0];
+  if (image) {
+    return `<img src="${escapeHTML(image.url)}" alt="${escapeHTML(image.alt || product.title)}" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />`;
+  }
+  return `<div class="ph">${escapeHTML(product.title)}</div>`;
 }
 
 function escapeHTML(str) {
