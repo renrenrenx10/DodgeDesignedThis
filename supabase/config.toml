@@ -1,0 +1,12 @@
+[functions.create-checkout-session]
+# Called by the storefront — any visitor can trigger this, so it stays on
+# the default JWT check (satisfied automatically by the anon key the
+# browser sends).
+verify_jwt = true
+
+[functions.stripe-webhook]
+# Stripe calls this directly — it has no Supabase login token, only its
+# own signature (which the function verifies itself via
+# STRIPE_WEBHOOK_SECRET). Keep this false, or Supabase will reject every
+# webhook delivery with 401 before our code even runs.
+verify_jwt = false
