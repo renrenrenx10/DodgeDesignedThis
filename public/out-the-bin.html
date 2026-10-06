@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dodge Designed This — Tees</title>
+<title>Dodge Designed This — Out The Bin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -30,14 +30,16 @@
   .cat-hero .tag{font-size:12px; font-weight:700; letter-spacing:2px; color:var(--mid); margin-bottom:8px;}
   .cat-hero h1{font-size:36px; margin-bottom:12px;}
   .cat-hero .blurb{font-size:13px; line-height:1.7; color:#444; max-width:560px; text-transform:none; letter-spacing:0;}
+  .cat-hero .pricenote{font-size:11px; color:var(--mid); letter-spacing:1px; margin-top:10px;}
 
-  .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding:36px 0 60px;}
+  .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding:36px 0 20px;}
   .cat-grid .card{position:relative; display:block;}
   .cat-grid .imgwrap{aspect-ratio:1/1; background:var(--grey); overflow:hidden; margin-bottom:12px;}
   .cat-grid .ph{display:flex; align-items:center; justify-content:center; height:100%; width:100%; font-size:11px; font-weight:700; letter-spacing:1px; color:var(--mid); border:2px dashed var(--mid); text-align:center; padding:10px;}
   .cat-grid h3{font-size:13px; font-weight:500; margin-bottom:4px;}
   .cat-grid .price{font-weight:700; font-size:13px;}
-  .cat-grid .gig{font-size:10.5px; color:var(--mid); font-weight:400; margin-left:3px;}
+
+  .bin-note{padding:0 0 60px; font-size:11px; color:var(--mid); letter-spacing:1px; max-width:560px; line-height:1.7;}
 
   footer{background:var(--grey); border-top:2px solid var(--ink); padding:40px 0 30px;}
   .footgrid{display:grid; grid-template-columns:1fr; gap:24px;}
@@ -59,29 +61,32 @@
   <div class="wrap topbar">
     <div class="brand"><a href="index.html"><img src="img/brand/logo.jpg" alt="Dodge Designed This" /></a></div>
     <nav>
-      <a href="tees.html" class="current">Tees</a>
+      <a href="tees.html">Tees</a>
       <a href="hoodies-sweats.html">Hoodies &amp; Sweats</a>
       <a href="caps.html">Caps</a>
-      <a href="out-the-bin.html">Out The Bin</a>
+      <a href="out-the-bin.html" class="current">Out The Bin</a>
       <a href="band-print-bundles.html">Band Print Bundles</a>
       <a href="about.html">About</a>
     </nav>
   </div>
 </header>
 
-<div class="wrap crumb"><a href="index.html">Home</a> / Tees</div>
+<div class="wrap crumb"><a href="index.html">Home</a> / Out The Bin</div>
 
 <section class="wrap cat-hero">
-  <div class="tag">Shop — Tees</div>
-  <h1>Tees</h1>
-  <p class="blurb">Hand screen-printed, one at a time, in a Sheffield basement. We rotate between different tee stocks, but nothing ever goes out under 150gsm — proper weight, not fast-fashion tissue paper. No two shirts are ever quite identical.</p>
+  <div class="tag">Shop — Out The Bin</div>
+  <h1>Out The Bin</h1>
+  <p class="blurb">Factory seconds, misprints and one-offs that didn't make the main rail. Flat price, no gig discount, no returns, no refunds, no complaints — that's the deal.</p>
+  <div class="pricenote">£7.00 flat</div>
 </section>
 
 <div class="wrap">
-  <div class="cat-grid" id="tee-grid">
+  <div class="cat-grid" id="bin-grid">
     <!-- populated from Supabase -->
   </div>
 </div>
+
+<div class="wrap bin-note">Everything here is one-off — once a size is gone, it's gone for good. No exchanges, no refunds: you're buying exactly what you see, warts and all.</div>
 
 <footer>
   <div class="wrap footgrid">
@@ -109,13 +114,13 @@
   import { getActiveProducts, productCardHTML } from "./assets/js/shop.js";
 
   (async function(){
-    const grid = document.getElementById('tee-grid');
-    const products = await getActiveProducts({ category: 'tees' });
+    const grid = document.getElementById('bin-grid');
+    const products = await getActiveProducts({ category: 'out-the-bin' });
     if (products.length === 0) {
-      grid.innerHTML = '<p style="text-transform:none; font-size:13px; color:#777;">No tees live right now — check back soon.</p>';
+      grid.innerHTML = '<p style="text-transform:none; font-size:13px; color:#777;">Nothing in the bin right now — check back soon.</p>';
       return;
     }
-    grid.innerHTML = products.map(p => productCardHTML(p)).join('');
+    grid.innerHTML = products.map(p => productCardHTML(p, { showGig: false })).join('');
   })();
 </script>
 

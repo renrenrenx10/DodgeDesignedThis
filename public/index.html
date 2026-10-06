@@ -19,12 +19,16 @@
   .topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 0; flex-wrap:wrap; gap:12px;}
   .brand{display:flex; align-items:center; gap:10px;}
   .brand .word{font-weight:700; font-size:16px; letter-spacing:0.5px; color:#fff;}
+  .brand img{height:46px; width:auto; display:block;}
   nav{display:flex; gap:18px; flex-wrap:wrap;}
   nav a{font-size:12px; font-weight:600; letter-spacing:0.5px; border-bottom:2px solid transparent; padding-bottom:2px; color:#fff;}
   nav a:hover{border-color:#fff;}
 
-  .hero{background:#000; border-bottom:2px solid var(--ink); position:relative; overflow:hidden; min-height:320px;}
-  .hero-content{padding:40px 24px; max-width:340px; color:#fff;}
+  .hero{background:#000; border-bottom:2px solid var(--ink); overflow:hidden;}
+  .hero-inner{max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; padding:0 24px;}
+  .hero-media{flex:1 1 380px; display:flex; align-items:center; justify-content:center; padding:24px 0;}
+  .hero-media img{width:100%; max-width:460px; height:auto;}
+  .hero-content{flex:1 1 320px; padding:40px 0; max-width:360px; color:#fff;}
   .hero-content h1{font-size:40px; line-height:0.95; color:#fff; margin-bottom:14px;}
   .hero-content .tagline{margin:0 0 22px; display:flex; flex-direction:column; gap:7px;}
   .hero-content .tagline span{font-size:13px; line-height:1.3; color:#fff;}
@@ -68,6 +72,11 @@
 
   @media (max-width:860px){
     .topbar{justify-content:center; text-align:center;}
+    .hero-inner{flex-direction:column; text-align:center;}
+    .hero-content{padding-bottom:0; align-items:center;}
+    .hero-content .tagline{align-items:center;}
+    .btnrow{justify-content:center;}
+    .hero-media{padding-top:0; max-width:320px;}
     .manifesto .inner{grid-template-columns:1fr; gap:30px;}
     .foot-links{max-width:none;}
     nav{width:100%; justify-content:center;}
@@ -78,7 +87,7 @@
 
 <header>
   <div class="wrap topbar">
-    <div class="brand"><div class="word">Dodge Designed This</div></div>
+    <div class="brand"><a href="index.html"><img src="img/brand/logo.jpg" alt="Dodge Designed This" /></a></div>
     <nav>
       <a href="tees.html">Tees</a>
       <a href="hoodies-sweats.html">Hoodies &amp; Sweats</a>
@@ -91,17 +100,22 @@
 </header>
 
 <section class="hero">
-  <div class="hero-content">
-    <h1>WEAR THE<br/>CHAOS.</h1>
-    <div class="tagline">
-      <span>DIY punk clothing, hand screen-printed</span>
-      <span>in a Sheffield basement.</span>
-      <span>Born from GTFOD, ripped-off designs and band tees</span>
-      <span>one press, no corporate nonsense.</span>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <h1>WEAR THE<br/>CHAOS.</h1>
+      <div class="tagline">
+        <span>DIY punk clothing, hand screen-printed</span>
+        <span>in a Sheffield basement.</span>
+        <span>Born from GTFOD, ripped-off designs and band tees</span>
+        <span>one press, no corporate nonsense.</span>
+      </div>
+      <div class="btnrow">
+        <a class="btn" href="tees.html">Shop The Drop</a>
+        <a class="btn alt" href="band-print-bundles.html">Band Print Bundles</a>
+      </div>
     </div>
-    <div class="btnrow">
-      <a class="btn" href="tees.html">Shop The Drop</a>
-      <a class="btn alt" href="band-print-bundles.html">Band Print Bundles</a>
+    <div class="hero-media">
+      <img src="img/brand/hero-skull.jpg" alt="Dodge Designed This skull mascot" />
     </div>
   </div>
 </section>
