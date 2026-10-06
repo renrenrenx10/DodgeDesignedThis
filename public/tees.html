@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Tees</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--paper); color:var(--ink); font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:1440px; margin:0 auto; padding:0 36px;}
+  h1,h2,h3{font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.5px; margin:0;}
+
+  header{border-bottom:2px solid #000; background:#000;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:18px 0; flex-wrap:wrap; gap:16px;}
+  .brand .word{font-weight:700; font-size:16px; letter-spacing:0.5px; color:#fff;}
+  nav{display:flex; gap:24px; flex-wrap:wrap;}
+  nav a{font-size:13.5px; font-weight:600; letter-spacing:0.5px; border-bottom:2px solid transparent; padding-bottom:2px; color:#fff;}
+  nav a.current{border-color:#fff;}
+  nav a:hover{border-color:#fff;}
+
+  .crumb{padding:18px 0; font-size:11px; color:var(--mid); letter-spacing:1px;}
+
+  .cat-hero{padding:30px 0 28px; border-bottom:2px solid var(--ink);}
+  .cat-hero .tag{font-size:12px; font-weight:700; letter-spacing:2px; color:var(--mid); margin-bottom:8px;}
+  .cat-hero h1{font-size:36px; margin-bottom:12px;}
+  .cat-hero .blurb{font-size:13px; line-height:1.7; color:#444; max-width:560px; text-transform:none; letter-spacing:0;}
+
+  .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding:36px 0 60px;}
+  .cat-grid .card{position:relative; display:block;}
+  .cat-grid .imgwrap{aspect-ratio:1/1; background:var(--grey); overflow:hidden; margin-bottom:12px;}
+  .cat-grid .ph{display:flex; align-items:center; justify-content:center; height:100%; width:100%; font-size:11px; font-weight:700; letter-spacing:1px; color:var(--mid); border:2px dashed var(--mid); text-align:center; padding:10px;}
+  .cat-grid h3{font-size:13px; font-weight:500; margin-bottom:4px;}
+  .cat-grid .price{font-weight:700; font-size:13px;}
+  .cat-grid .gig{font-size:10.5px; color:var(--mid); font-weight:400; margin-left:3px;}
+
+  footer{background:var(--grey); border-top:2px solid var(--ink); padding:40px 0 30px;}
+  .footgrid{display:grid; grid-template-columns:1fr; gap:24px;}
+  .foot-links{display:grid; grid-template-columns:1fr 1fr; gap:30px; max-width:420px;}
+  .footgrid h4{font-size:13px; margin-bottom:12px;}
+  .footgrid p, .footgrid a{font-size:13px; line-height:1.8; display:block;}
+  .legal{margin-top:30px; font-size:11px; opacity:0.7; border-top:1px solid var(--ink); padding-top:16px;}
+
+  @media (max-width:860px){
+    nav{width:100%; justify-content:flex-start;}
+    .cat-grid{grid-template-columns:repeat(2,1fr); gap:20px;}
+    .foot-links{max-width:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><div class="word">Dodge Designed This</div></div>
+    <nav>
+      <a href="tees.html" class="current">Tees</a>
+      <a href="hoodies-sweats.html">Hoodies &amp; Sweats</a>
+      <a href="caps.html">Caps</a>
+      <a href="out-the-bin.html">Out The Bin</a>
+      <a href="band-print-bundles.html">Band Print Bundles</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap crumb"><a href="index.html">Home</a> / Tees</div>
+
+<section class="wrap cat-hero">
+  <div class="tag">Shop — Tees</div>
+  <h1>Tees</h1>
+  <p class="blurb">Hand screen-printed, one at a time, in a Sheffield basement. We rotate between different tee stocks, but nothing ever goes out under 150gsm — proper weight, not fast-fashion tissue paper. No two shirts are ever quite identical.</p>
+</section>
+
+<div class="wrap">
+  <div class="cat-grid" id="tee-grid">
+    <!-- populated from Supabase -->
+  </div>
+</div>
+
+<footer>
+  <div class="wrap footgrid">
+    <div class="brand">
+      <div>
+        <div class="word">Dodge Designed This</div>
+        <p style="margin:6px 0 0;">Live Fast — Print Hard.</p>
+      </div>
+    </div>
+    <div class="foot-links">
+      <div>
+        <h4>Shop</h4>
+        <a href="tees.html">Tees</a><a href="hoodies-sweats.html">Hoodies &amp; Sweats</a><a href="caps.html">Caps</a><a href="out-the-bin.html">Out The Bin</a><a href="band-print-bundles.html">Band Print Bundles</a>
+      </div>
+      <div>
+        <h4>Info</h4>
+        <a href="about.html">Delivery &amp; Returns</a><a href="about.html">Contact</a><a href="about.html">About</a>
+      </div>
+    </div>
+  </div>
+  <div class="wrap legal">© Dodge Designed This. All prints hand-pulled, all mistakes intentional-ish.</div>
+</footer>
+
+<script type="module">
+  import { getActiveProducts, productCardHTML } from "./assets/js/shop.js";
+
+  (async function(){
+    const grid = document.getElementById('tee-grid');
+    const products = await getActiveProducts({ category: 'tees' });
+    if (products.length === 0) {
+      grid.innerHTML = '<p style="text-transform:none; font-size:13px; color:#777;">No tees live right now — check back soon.</p>';
+      return;
+    }
+    grid.innerHTML = products.map(p => productCardHTML(p)).join('');
+  })();
+</script>
+
+</body>
+</html>

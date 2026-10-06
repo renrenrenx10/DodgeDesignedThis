@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--paper); color:var(--ink); font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:1440px; margin:0 auto; padding:0 36px;}
+  h1,h2,h3{font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.5px; margin:0;}
+
+  header{border-bottom:2px solid #000; background:#000;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:18px 0; flex-wrap:wrap; gap:16px;}
+  .brand .word{font-weight:700; font-size:16px; letter-spacing:0.5px; color:#fff;}
+  nav{display:flex; gap:24px; flex-wrap:wrap;}
+  nav a{font-size:13.5px; font-weight:600; letter-spacing:0.5px; border-bottom:2px solid transparent; padding-bottom:2px; color:#fff;}
+  nav a:hover{border-color:#fff;}
+
+  .crumb{padding:18px 0; font-size:11px; color:var(--mid); letter-spacing:1px;}
+
+  .product{display:grid; grid-template-columns:1.1fr 1fr; gap:60px; padding-bottom:70px; align-items:start;}
+  .gallery .main-shot{background:var(--grey); aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;}
+  .gallery .ph{font-size:13px; font-weight:700; letter-spacing:1px; color:var(--mid); border:2px dashed var(--mid); padding:20px; text-align:center; margin:20px;}
+
+  .pd-tag{font-size:12px; font-weight:700; letter-spacing:2px; color:var(--mid); margin-bottom:10px;}
+  .pd-title{font-size:34px; line-height:1.05; margin-bottom:12px;}
+  .pd-price{font-size:22px; font-weight:700; margin-bottom:22px;}
+  .pd-desc{font-size:13px; line-height:1.8; color:#444; max-width:460px; margin-bottom:26px; text-transform:none; letter-spacing:0;}
+  .pd-boiler{font-size:12px; line-height:1.75; color:#555; max-width:460px; margin-top:18px; padding-top:18px; border-top:1px dashed var(--mid); text-transform:none; letter-spacing:0;}
+
+  .pd-block{margin-bottom:26px;}
+  .pd-label{font-size:12px; font-weight:700; letter-spacing:1.5px; margin-bottom:10px;}
+  .sizes{display:flex; gap:8px; flex-wrap:wrap;}
+  .sizes button{font-family:'Oswald',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.5px; width:46px; height:46px; border:2px solid var(--ink); background:#fff; color:var(--ink); cursor:pointer;}
+  .sizes button.active{background:var(--ink); color:#fff;}
+  .sizes button:disabled{opacity:0.3; text-decoration:line-through; cursor:not-allowed;}
+
+  .colours{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  .colours button{width:32px; height:32px; border-radius:50%; border:2px solid var(--ink); cursor:pointer; padding:0; position:relative;}
+  .colours button.active::after{content:""; position:absolute; inset:-5px; border:2px solid var(--ink); border-radius:50%;}
+  .colours .c-name{font-size:11px; color:var(--mid); margin-left:4px; letter-spacing:0.5px;}
+
+  .qty-row{display:flex; align-items:stretch; gap:14px;}
+  .qty{display:flex; align-items:center; border:2px solid var(--ink);}
+  .qty button{width:42px; background:#fff; border:none; font-size:16px; font-weight:700; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .qty span{width:40px; text-align:center; font-weight:700; font-size:14px;}
+  .btn-add{flex:1; font-weight:700; font-size:14px; padding:0 20px; border:2px solid var(--ink); background:var(--ink); color:#fff; letter-spacing:0.5px; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+  .btn-add:disabled{opacity:0.4; cursor:not-allowed;}
+
+  .pd-meta{border-top:1px solid var(--ink); margin-top:30px; padding-top:20px; display:flex; flex-direction:column; gap:14px;}
+  .pd-meta .row{display:flex; gap:14px; align-items:baseline;}
+  .pd-meta .label{font-size:11px; font-weight:700; letter-spacing:1.5px; color:var(--ink); flex-shrink:0; width:76px;}
+  .pd-meta .copy{font-size:12.5px; line-height:1.6; color:#555; text-transform:none; letter-spacing:0;}
+
+  footer{background:var(--grey); border-top:2px solid var(--ink); padding:40px 0 30px;}
+  .footgrid{display:grid; grid-template-columns:1fr; gap:24px;}
+  .foot-links{display:grid; grid-template-columns:1fr 1fr; gap:30px; max-width:420px;}
+  .footgrid h4{font-size:13px; margin-bottom:12px;}
+  .footgrid p, .footgrid a{font-size:13px; line-height:1.8; display:block;}
+  .legal{margin-top:30px; font-size:11px; opacity:0.7; border-top:1px solid var(--ink); padding-top:16px;}
+
+  @media (max-width:860px){ .product{grid-template-columns:1fr; gap:30px;} .foot-links{max-width:none;} nav{width:100%; justify-content:flex-start;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><div class="word">Dodge Designed This</div></div>
+    <nav>
+      <a href="tees.html">Tees</a>
+      <a href="hoodies-sweats.html">Hoodies &amp; Sweats</a>
+      <a href="caps.html">Caps</a>
+      <a href="out-the-bin.html">Out The Bin</a>
+      <a href="band-print-bundles.html">Band Print Bundles</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap crumb" id="crumb"><a href="index.html">Home</a> / …</div>
+
+<div class="wrap product" id="product-root">
+  <p style="grid-column:1/-1; text-transform:none;">Loading…</p>
+</div>
+
+<footer>
+  <div class="wrap footgrid">
+    <div class="brand">
+      <div>
+        <div class="word">Dodge Designed This</div>
+        <p style="margin:6px 0 0;">Live Fast — Print Hard.</p>
+      </div>
+    </div>
+    <div class="foot-links">
+      <div>
+        <h4>Shop</h4>
+        <a href="tees.html">Tees</a><a href="hoodies-sweats.html">Hoodies &amp; Sweats</a><a href="caps.html">Caps</a><a href="out-the-bin.html">Out The Bin</a><a href="band-print-bundles.html">Band Print Bundles</a>
+      </div>
+      <div>
+        <h4>Info</h4>
+        <a href="about.html">Delivery &amp; Returns</a><a href="about.html">Contact</a><a href="about.html">About</a>
+      </div>
+    </div>
+  </div>
+  <div class="wrap legal">© Dodge Designed This. All prints hand-pulled, all mistakes intentional-ish.</div>
+</footer>
+
+<script type="module">
+  import { getProductBySlug, formatPrice, buyNow } from "./assets/js/shop.js";
+
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+  const root = document.getElementById('product-root');
+  const crumb = document.getElementById('crumb');
+
+  function esc(s){ const d=document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+
+  (async function(){
+    if (!slug) {
+      root.innerHTML = '<p style="grid-column:1/-1; text-transform:none;">No product specified.</p>';
+      return;
+    }
+    const product = await getProductBySlug(slug);
+    if (!product) {
+      root.innerHTML = '<p style="grid-column:1/-1; text-transform:none;">Product not found or no longer available.</p>';
+      return;
+    }
+
+    document.title = `Dodge Designed This — ${product.title}`;
+    crumb.innerHTML = `<a href="index.html">Home</a> / <a href="${product.category}.html">${esc(product.category.replace('-', ' '))}</a> / ${esc(product.title)}`;
+
+    const colours = [...new Map(product.variants.map(v => [v.colour, v])).values()];
+    const sizesOrder = ['XS','S','M','L','XL','2XL'];
+
+    let selectedColour = colours[0]?.colour ?? null;
+
+    function variantFor(size, colour) {
+      return product.variants.find(v => v.size === size && v.colour === colour);
+    }
+
+    function render() {
+      const sizesForColour = sizesOrder.filter(s => product.variants.some(v => v.size === s && v.colour === selectedColour));
+      root.innerHTML = `
+        <div class="gallery">
+          <div class="main-shot"><div class="ph">${esc(product.title)}<br/>(photo coming soon)</div></div>
+        </div>
+        <div class="pd-info">
+          <div class="pd-tag">${esc(product.tag || '')}</div>
+          <h1 class="pd-title">${esc(product.title)}</h1>
+          <div class="pd-price">${formatPrice(product.price_pence)}${product.gig_price_pence ? ` <span style="font-size:12px; color:var(--mid); font-weight:400;">· ${formatPrice(product.gig_price_pence)} at gigs</span>` : ''}</div>
+          ${product.blurb ? `<p class="pd-desc">${esc(product.blurb)}</p>` : ''}
+          ${product.boilerplate ? `<p class="pd-boiler">${esc(product.boilerplate)}</p>` : ''}
+
+          <div class="pd-block">
+            <div class="pd-label">Size</div>
+            <div class="sizes" id="size-row">
+              ${sizesOrder.map(size => {
+                const v = variantFor(size, selectedColour);
+                const disabled = !v || v.stock <= 0;
+                return `<button type="button" data-size="${size}" ${disabled ? 'disabled' : ''}>${size}</button>`;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="pd-block">
+            <div class="pd-label">Colour</div>
+            <div class="colours" id="colour-row">
+              ${colours.map(c => `<button type="button" data-colour="${esc(c.colour)}" class="${c.colour === selectedColour ? 'active' : ''}" style="background:${c.colour_hex || '#ccc'};" title="${esc(c.colour)}" aria-label="${esc(c.colour)}"></button>`).join('')}
+              <span class="c-name">${esc(selectedColour || '')}</span>
+            </div>
+          </div>
+
+          <div class="pd-block">
+            <div class="pd-label">Quantity</div>
+            <div class="qty-row">
+              <div class="qty">
+                <button type="button" id="qty-dec" aria-label="Decrease">—</button>
+                <span id="qty-val">1</span>
+                <button type="button" id="qty-inc" aria-label="Increase">+</button>
+              </div>
+              <button type="button" class="btn-add" id="buy-btn" disabled>Select a size</button>
+            </div>
+          </div>
+
+          <div class="pd-meta">
+            <div class="row"><div class="label">Shipping</div><div class="copy">You've just grabbed some chaos in cotton form — nice one. UK only, free. This isn't Amazon, it's one fella in a basement, so give it a little longer than you're used to.</div></div>
+            <div class="row"><div class="label">Returns</div><div class="copy">Not quite right? No forms, no stress — just hit us up and we'll sort it. Covered by the standard 14-day right to cancel.</div></div>
+            <div class="row"><div class="label">Sizing</div><div class="copy">If your size isn't listed, just shout. DIY means flexible, not fast-fashion cookie cutter.</div></div>
+          </div>
+        </div>
+      `;
+
+      let selectedSize = null;
+      let qty = 1;
+
+      const sizeRow = document.getElementById('size-row');
+      const colourRow = document.getElementById('colour-row');
+      const buyBtn = document.getElementById('buy-btn');
+      const qtyVal = document.getElementById('qty-val');
+
+      function updateBuyBtn() {
+        if (!selectedSize) {
+          buyBtn.disabled = true;
+          buyBtn.textContent = 'Select a size';
+          return;
+        }
+        buyBtn.disabled = false;
+        buyBtn.textContent = 'Buy Now';
+      }
+
+      sizeRow.querySelectorAll('button:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+          sizeRow.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedSize = btn.getAttribute('data-size');
+          updateBuyBtn();
+        });
+      });
+
+      colourRow.querySelectorAll('button[data-colour]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedColour = btn.getAttribute('data-colour');
+          render();
+        });
+      });
+
+      document.getElementById('qty-dec').addEventListener('click', () => { qty = Math.max(1, qty - 1); qtyVal.textContent = qty; });
+      document.getElementById('qty-inc').addEventListener('click', () => { qty = qty + 1; qtyVal.textContent = qty; });
+
+      buyBtn.addEventListener('click', () => {
+        const v = variantFor(selectedSize, selectedColour);
+        if (!v) return;
+        buyBtn.disabled = true;
+        buyBtn.textContent = 'Redirecting to checkout…';
+        buyNow(v.id, qty);
+      });
+
+      updateBuyBtn();
+    }
+
+    render();
+  })();
+</script>
+
+</body>
+</html>
