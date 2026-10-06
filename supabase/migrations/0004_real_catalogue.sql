@@ -1,17 +1,18 @@
 -- Real catalogue, crawled from the live Freewebstore site on 2026-10-06.
--- Replaces the earlier placeholder tee/hoodie seed data (0002, 0003) with real
--- products, real stock counts, real sizes/colours and real descriptions.
--- Stock is the real total per product at crawl time, split evenly across each
--- product's size/colour combinations since Freewebstore didn't track per-variant
--- stock separately -- correct any individual counts once you're checking stock by hand.
--- Out The Bin (seeded in 0003) is untouched -- those are standalone one-offs, not
--- part of the main catalogue.
+-- Corrected version: the first attempt tried to DELETE the old placeholder
+-- products outright, which fails because the 'hide-and-seek-club-tee' row (used
+-- in the earlier real Stripe test purchase) is still referenced by order_items --
+-- Postgres won't let you delete a row another table still points to.
+--
+-- This version never deletes a product. Old placeholders with no equivalent in
+-- the real catalogue are just deactivated (active = false) so order history stays
+-- intact. The few slugs that DO collide with the real catalogue (attack-on-dodgetan,
+-- brain-dump, wayne-campbell-purple-sweat) are updated in place via upsert instead
+-- of insert, and their variants are upserted too (stock refreshed, nothing deleted).
+-- Safe to re-run.
 
--- Remove the old placeholder products this replaces (cascades to their variants).
-delete from products where slug in (
-  'hide-and-seek-club-tee', 'og-dodge-tee', 'attack-on-dodgetan', 'brain-dump',
-  'gtfod-garage-punks-tee', 'angry-ape-hoodie', 'wayne-campbell-purple-sweat'
-);
+-- Retire old placeholders that have no equivalent in the real catalogue.
+update products set active = false where slug in ('hide-and-seek-club-tee', 'og-dodge-tee', 'gtfod-garage-punks-tee', 'angry-ape-hoodie');
 
 insert into products (slug, category, title, tag, blurb, boilerplate, price_pence, gig_price_pence, active, sort_order)
 values
@@ -39,9 +40,13 @@ values
   ('its-not-our-fault-that-your-boyfriends-stupid', 'tees', 'Its Not Our Fault That Your Boyfriends Stupid', 'Tees — Screen Printed', 'It’s Not Our Fault Your Boyfriend’s Stupid translates Mannion’s LP cover into wearable chaos. The surreal slab of ink is equal parts creepy, funny, and absurd — a perfect example of Dodge embracing their own brand of ugly-beautiful nonsense. Hand-pulled on heavyweight cotton, each print carries slight imperfections that give it character, echoing the raw energy of the original artwork. This isn’t just merch; it’s a historical snapshot of Dodge’s creative evolution. The shirt embodies the era when the band stopped trying to please anyone and leaned fully into their unique vision. The heavyweight cotton ensures durability while keeping the tee comfortable, making it suitable for gigs, streetwear, or just lounging in unapologetic style. Wear it if you’ve ever loved a record so much you wanted to crawl inside the artwork. Wear it if you’ve ever rolled your eyes at a bad boyfriend. Mostly — wear it because it looks sick and perfectly embodies DIY punk attitude. The LowDownUsually printed on Fruit of the Loom Valueweight 165gsm. Sometimes we switch brands, but we always aim to stay over 150gsm for every tee. Tee tech spec:Fruit of the Loom Valueweight 165gsm100% CottonCrew neck with Cotton/ LYCRA® ribSelf-fabric neck tapeFine knit gauge for enhanced printabilitySizes: S–2XL Wash sensibly. Tumble drying is at yr risk, but if it shrinks, that’s on you.If your size or print is out of stock, just holla up — we’ll try and work something out.This is just a one-man-band kinda outfit - be nice.', 'All Dodge tees are hand screen-printed in Sheffield, one at a time. We rotate between different tee stocks, but nothing ever goes out under 150gsm — proper weight, not fast-fashion tissue paper. Hand-printed means no two shirts are ever quite identical: smudges, wobble and all, that''s the point, not a fault. Free UK postage on everything. Can''t see your size? Just shout, we''ll sort a custom run. Same print''s a fiver at gigs.', 1000, 500, true, 18),
   ('renvis-and-butt-james', 'tees', 'Renvis & Butt-James', 'Tees — Screen Printed', 'Some friendships are forged in noise, cheap beer, and really dumb jokes. Renvis & Butt-James is our parody of the kings of 90s stupidity, Beavis & Butt-Head, reimagined as Dodge boys. The hand-pulled black-and-white screen print brings a crisp, raw, DIY energy that perfectly captures the essence of irreverent friendship and chaotic humour. The tee balances comfort and durability with heavyweight cotton, making it ready for gigs, shops, and even questionable washing cycles. Every shirt carries slight variations from hand-printing, so each piece is unique — just like the ridiculous antics it celebrates. It’s not high art — it’s low-brow brilliance. Wear it to share a laugh, make your mates snort, or just flex the chaotic energy of Dodge in your wardrobe. It’s punk, it’s funny, it’s unapologetic — and it’s ready to survive everything you throw at it. The LowDownUsually printed on Fruit of the Loom Valueweight 165gsm. Sometimes we switch brands, but we always aim to stay over 150gsm for every tee. Tee tech spec:Fruit of the Loom Valueweight 165gsm100% CottonCrew neck with Cotton/ LYCRA® ribSelf-fabric neck tapeFine knit gauge for enhanced printabilitySizes: S–2XL Wash sensibly. Tumble drying is at yr risk, but if it shrinks, that’s on you.If your size or print is out of stock, just holla up — we’ll try and work something out.This is just a one-man-band kinda outfit - be nice.', 'All Dodge tees are hand screen-printed in Sheffield, one at a time. We rotate between different tee stocks, but nothing ever goes out under 150gsm — proper weight, not fast-fashion tissue paper. Hand-printed means no two shirts are ever quite identical: smudges, wobble and all, that''s the point, not a fault. Free UK postage on everything. Can''t see your size? Just shout, we''ll sort a custom run. Same print''s a fiver at gigs.', 1000, 500, true, 19),
   ('they-lived', 'tees', 'They Lived', 'Tees — Screen Printed', 'They Lived is a hand-printed homage to John Carpenter’s cult classic They Live, translated through a punk DIY lens. The iconic shades, hidden messages, and underground paranoia are reimagined as bold black-and-white artwork on soft cotton, with textures that feel like a back-alley zine or garage cinema flyer. Hand screen-printing ensures each shirt is unique, with subtle imperfections that add character and depth. The design captures the essence of the film — seeing the truth beneath the surface — while staying firmly in the realm of Dodge’s chaotic, DIY aesthetic. The tee balances bold visuals with comfortable wear, making it a statement piece for fans of cult cinema, punk culture, and underground art. Wear it as a reminder that sometimes the world is stranger than it seems and that underground culture always notices what’s really going on. This tee turns classic paranoia into wearable punk philosophy. The LowDownUsually printed on Fruit of the Loom Valueweight 165gsm. Sometimes we switch brands, but we always aim to stay over 150gsm for every tee. Tee tech spec:Fruit of the Loom Valueweight 165gsm100% CottonCrew neck with Cotton/ LYCRA® ribSelf-fabric neck tapeFine knit gauge for enhanced printabilitySizes: S–2XL Wash sensibly. Tumble drying is at yr risk, but if it shrinks, that’s on you.If your size or print is out of stock, just holla up — we’ll try and work something out.This is just a one-man-band kinda outfit - be nice.', 'All Dodge tees are hand screen-printed in Sheffield, one at a time. We rotate between different tee stocks, but nothing ever goes out under 150gsm — proper weight, not fast-fashion tissue paper. Hand-printed means no two shirts are ever quite identical: smudges, wobble and all, that''s the point, not a fault. Free UK postage on everything. Can''t see your size? Just shout, we''ll sort a custom run. Same print''s a fiver at gigs.', 1000, 500, true, 20)
-on conflict (slug) do nothing;
+on conflict (slug) do update set
+  category = excluded.category, title = excluded.title, tag = excluded.tag,
+  blurb = excluded.blurb, boilerplate = excluded.boilerplate,
+  price_pence = excluded.price_pence, gig_price_pence = excluded.gig_price_pence,
+  active = true, sort_order = excluded.sort_order;
 
--- Variants (size/colour/stock), one insert block per product.
+-- Variants: upsert so re-running this refreshes stock instead of erroring or duplicating.
 -- GTFOD Angry Ape hoodie (gtfod-angry-ape-hoodie) -- 8 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
 select p.id, v.size, v.colour, v.colour_hex, v.stock, p.slug || '-' || lower(v.size) || '-' || lower(replace(v.colour, ' ', '-'))
@@ -53,7 +58,8 @@ cross join (values
   ('2XL', 'Default', null, 2)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'gtfod-angry-ape-hoodie'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Hide & Seek Club (hide-and-seek-club) -- 3 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -67,7 +73,8 @@ cross join (values
   ('2XL', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'hide-and-seek-club'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Hide & Seek Club Big Foot/Sasquatch Tee (hide-and-seek-club-big-foot-sasquatch-tee) -- 5 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -81,7 +88,8 @@ cross join (values
   ('2XL', 'Yellow', '#F5D64B', 1)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'hide-and-seek-club-big-foot-sasquatch-tee'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- OG Dodge Tee (Est. 2021) (og-dodge-tee-est-2021) -- 1 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -105,7 +113,8 @@ cross join (values
   ('2XL', 'Yellow', '#F5D64B', 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'og-dodge-tee-est-2021'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Brain Dump (brain-dump) -- 2 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -119,7 +128,8 @@ cross join (values
   ('2XL', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'brain-dump'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- The Wayne Campbell (wayne-campbell-donna-tee) -- 8 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -133,7 +143,8 @@ cross join (values
   ('2XL', 'Default', null, 1)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'wayne-campbell-donna-tee'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Baby BAYBI (baby-baybi) -- 5 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -147,7 +158,8 @@ cross join (values
   ('2XL', 'Default', null, 1)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'baby-baybi'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Attack on Dodgetan (attack-on-dodgetan) -- 3 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -174,7 +186,8 @@ cross join (values
   ('3XL', 'White', '#FFFFFF', 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'attack-on-dodgetan'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Be Excellent To Each Other (be-excellent-to-each-other) -- 2 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -193,7 +206,8 @@ cross join (values
   ('2XL', 'Pink Tee - White Ink', '#FFC0CB', 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'be-excellent-to-each-other'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- D.A.R.E (d-a-r-e) -- 4 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -207,7 +221,8 @@ cross join (values
   ('2XL', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'd-a-r-e'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Easter Bonnie (easter-bonnie) -- 5 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -220,7 +235,8 @@ cross join (values
   ('XL', 'Default', null, 1)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'easter-bonnie'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Goop (goop) -- 2 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -234,7 +250,8 @@ cross join (values
   ('2XL', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'goop'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- GTFOD - CBGB Burgundy Tee (gtfod-cbgb-burgundy-tee) -- 1 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -244,7 +261,8 @@ cross join (values
   ('One Size', 'Default', null, 1)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'gtfod-cbgb-burgundy-tee'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- GTFOD Rubber Hose (gtfod-rubber-hose) -- 10 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -273,7 +291,8 @@ cross join (values
   ('2XL', 'Brown', '#6F4E37', 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'gtfod-rubber-hose'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- GTFOD vs kiYOmi (gtfod-vs-kiyomi) -- 2 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -287,7 +306,8 @@ cross join (values
   ('2XL', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'gtfod-vs-kiyomi'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- GTFOD-CBGB (gtfod-cbgb) -- 5 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -301,7 +321,8 @@ cross join (values
   ('2XL', 'Default', null, 1)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'gtfod-cbgb'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Real Life Goo (real-life-goo) -- 9 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -315,7 +336,8 @@ cross join (values
   ('2XL', 'Default', null, 1)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'real-life-goo'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- The Wayne Campbell (wayne-campbell-purple-sweat) -- 3 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -329,7 +351,8 @@ cross join (values
   ('2XL', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'wayne-campbell-purple-sweat'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Human Beanz (human-beanz) -- 2 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -341,7 +364,8 @@ cross join (values
   ('L', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'human-beanz'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Live Fast / Print Hard Trucker Cap (live-fast-print-hard-trucker-cap) -- 4 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -351,7 +375,8 @@ cross join (values
   ('One Size', 'Default', null, 4)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'live-fast-print-hard-trucker-cap'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Meltvis (meltvis) -- 2 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -365,7 +390,8 @@ cross join (values
   ('2XL', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'meltvis'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Its Not Our Fault That Your Boyfriends Stupid (its-not-our-fault-that-your-boyfriends-stupid) -- 5 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -379,7 +405,8 @@ cross join (values
   ('2XL', 'Default', null, 1)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'its-not-our-fault-that-your-boyfriends-stupid'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- Renvis & Butt-James (renvis-and-butt-james) -- 3 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -389,7 +416,8 @@ cross join (values
   ('One Size', 'Default', null, 3)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'renvis-and-butt-james'
-on conflict (product_id, size, colour) do nothing;
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
 
 -- They Lived (they-lived) -- 0 total units at crawl time
 insert into variants (product_id, size, colour, colour_hex, stock, sku)
@@ -399,9 +427,12 @@ cross join (values
   ('One Size', 'Default', null, 0)
 ) as v(size, colour, colour_hex, stock)
 where p.slug = 'they-lived'
-on conflict (product_id, size, colour) do nothing;
--- Real product photos we actually have on file for this batch (the rest still
--- show a placeholder box on the storefront until photos exist for them).
+on conflict (product_id, size, colour) do update set
+  stock = excluded.stock, colour_hex = excluded.colour_hex;
+
+-- Real product photos we actually have on file for this batch (the rest still show
+-- a placeholder box on the storefront until photos exist for them). Guarded so
+-- re-running this doesn't create duplicate image rows.
 insert into product_images (product_id, url, alt, sort_order)
 select p.id, v.url, v.alt, 0
 from products p
@@ -414,4 +445,4 @@ cross join (values
   ('brain-dump', 'img/products/brain-dump.webp', 'Brain Dump')
 ) as v(slug, url, alt)
 where p.slug = v.slug
-on conflict do nothing;
+and not exists (select 1 from product_images pi where pi.product_id = p.id and pi.url = v.url);
