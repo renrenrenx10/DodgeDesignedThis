@@ -51,18 +51,20 @@
   .step p{font-size:14.5px; line-height:1.6; color:#444; text-transform:none; letter-spacing:0; margin:0;}
   .step a{text-decoration:underline;}
 
-  footer{background:var(--grey); border-top:2px solid var(--ink); padding:40px 0 30px;}
-  .footgrid{display:grid; grid-template-columns:1fr; gap:24px;}
-  .foot-links{display:grid; grid-template-columns:1fr 1fr; gap:30px; max-width:420px;}
-  .footgrid h4{font-size:15px; margin-bottom:12px;}
-  .footgrid p, .footgrid a{font-size:15px; line-height:1.8; display:block;}
-  .legal{margin-top:30px; font-size:13px; opacity:0.7; border-top:1px solid var(--ink); padding-top:16px;}
+  footer{background:#000; color:#fff; border-top:2px solid #000; padding:44px 0 28px;}
+  .footgrid{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:28px;}
+  .footgrid .brand .word{color:#fff;}
+  .footgrid .brand p{color:#bbb;}
+  .foot-links{display:flex; gap:56px; flex-wrap:wrap;}
+  .footgrid h4{font-size:13px; margin-bottom:10px; color:#fff;}
+  .footgrid p, .footgrid a{font-size:13px; line-height:1.8; display:block; color:#bbb;}
+  .footgrid a:hover{color:#fff;}
+  .legal{margin-top:26px; font-size:11px; opacity:0.6; border-top:1px solid #333; padding-top:14px; color:#fff;}
 
   @media (max-width:860px){
     nav{width:100%; justify-content:flex-start;}
     .bundle-grid{grid-template-columns:1fr;}
     .steps{grid-template-columns:1fr;}
-    .foot-links{max-width:none;}
   }
 </style>
 </head>
