@@ -194,7 +194,8 @@
     <div class="card">
       <h2>Sizes, Colours &amp; Stock</h2>
       <div id="variant-rows"></div>
-      <button type="button" class="addvariant" id="add-variant">+ Add Size / Colour</button>
+      <button type="button" class="addvariant" id="add-variant">+ Add Colour (S, M, L, XL, 2XL)</button>
+      <div class="field-note" style="margin-top:10px;">Adds S / M / L / XL / 2XL rows for a new colour — pick the colour on the first row and it fills in the rest.</div>
     </div>
 
     <div class="card savebar">
@@ -282,17 +283,34 @@
 
       images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
       originalVariants = product.variants || [];
-      originalVariants.forEach((v) => addVariantRow(v));
+      if (originalVariants.length > 0) {
+        originalVariants.forEach((v) => addVariantRow(v));
+      } else {
+        addSizeSet();
+      }
     }
   } else {
-    addVariantRow();
+    addSizeSet();
   }
 
   renderPhotoGrid();
 
-  document.getElementById("add-variant").addEventListener("click", () => addVariantRow());
+  document.getElementById("add-variant").addEventListener("click", () => addSizeSet());
 
-  function addVariantRow(variant) {
+  // The sizes Rene always stocks. Every time a size/colour block gets
+  // added — a brand new product, or another colour on an existing one —
+  // it adds one row per size here rather than a single blank row, since
+  // he's always going to want all of these for the new colour anyway.
+  const DEFAULT_SIZES = ["S", "M", "L", "XL", "2XL"];
+
+  function addSizeSet() {
+    // Rows added together share a batch id, so picking the colour on the
+    // first one can fill in the rest without Rene re-selecting it 5 times.
+    const batchId = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    DEFAULT_SIZES.forEach((size) => addVariantRow({ size, colour: "", colour_hex: "", stock: 0 }, batchId));
+  }
+
+  function addVariantRow(variant, batchId) {
     const currentColour = variant?.colour || "";
     const knownNames = COLOURS.map((c) => c.name);
     // If this row's existing colour isn't one of the fixed options (e.g. the
@@ -321,11 +339,25 @@
       <button type="button" class="remove" title="Remove">&times;</button>
     `;
     row.dataset.variantId = variant?.id || "";
+    if (batchId) row.dataset.batch = batchId;
     row.querySelector(".remove").addEventListener("click", () => row.remove());
     row.querySelector(".v-colour").addEventListener("change", (e) => {
       const opt = e.target.selectedOptions[0];
       const hex = opt?.dataset.hex || "";
       row.querySelector(".v-hex").value = hex;
+
+      // Pick a colour once on a freshly-added size block and it fills in
+      // the rest of that block's still-unpicked rows too.
+      const batch = row.dataset.batch;
+      if (batch) {
+        variantRows.querySelectorAll(`.variant-row[data-batch="${batch}"]`).forEach((other) => {
+          if (other === row) return;
+          const otherColour = other.querySelector(".v-colour");
+          if (otherColour.value) return; // already chosen on this row — leave it
+          otherColour.value = e.target.value;
+          other.querySelector(".v-hex").value = hex;
+        });
+      }
     });
     variantRows.appendChild(row);
   }
