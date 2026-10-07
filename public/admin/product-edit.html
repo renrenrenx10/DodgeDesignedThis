@@ -255,48 +255,6 @@
   const saveMsg = document.getElementById("save-msg");
   const saveBtn = document.getElementById("save-btn");
 
-  if (productId) {
-    document.getElementById("page-title").textContent = "Edit Product";
-    const { data: product, error } = await supabase
-      .from("products")
-      .select("*, variants(*), product_images(*)")
-      .eq("id", productId)
-      .single();
-
-    if (error || !product) {
-      saveMsg.textContent = "Couldn't load this product.";
-      saveMsg.className = "save-msg err";
-    } else {
-      els.title.value = product.title || "";
-      els.slug.value = product.slug || "";
-      els.category.value = product.category || "tees";
-      els.tag.value = product.tag || "";
-      els.blurb.value = product.blurb || "";
-      els.boilerplate.value = product.boilerplate || "";
-      els.seoTitle.value = product.seo_title || "";
-      els.metaDescription.value = product.meta_description || "";
-      els.tags.value = product.tags || "";
-      els.price.value = (product.price_pence / 100).toFixed(2);
-      els.gigPrice.value = product.gig_price_pence ? (product.gig_price_pence / 100).toFixed(2) : "";
-      els.sortOrder.value = product.sort_order || 0;
-      els.active.checked = product.active;
-
-      images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
-      originalVariants = product.variants || [];
-      if (originalVariants.length > 0) {
-        originalVariants.forEach((v) => addVariantRow(v));
-      } else {
-        addSizeSet();
-      }
-    }
-  } else {
-    addSizeSet();
-  }
-
-  renderPhotoGrid();
-
-  document.getElementById("add-variant").addEventListener("click", () => addSizeSet());
-
   // The sizes Rene always stocks. Every time a size/colour block gets
   // added — a brand new product, or another colour on an existing one —
   // it adds one row per size here rather than a single blank row, since
@@ -361,6 +319,48 @@
     });
     variantRows.appendChild(row);
   }
+
+  if (productId) {
+    document.getElementById("page-title").textContent = "Edit Product";
+    const { data: product, error } = await supabase
+      .from("products")
+      .select("*, variants(*), product_images(*)")
+      .eq("id", productId)
+      .single();
+
+    if (error || !product) {
+      saveMsg.textContent = "Couldn't load this product.";
+      saveMsg.className = "save-msg err";
+    } else {
+      els.title.value = product.title || "";
+      els.slug.value = product.slug || "";
+      els.category.value = product.category || "tees";
+      els.tag.value = product.tag || "";
+      els.blurb.value = product.blurb || "";
+      els.boilerplate.value = product.boilerplate || "";
+      els.seoTitle.value = product.seo_title || "";
+      els.metaDescription.value = product.meta_description || "";
+      els.tags.value = product.tags || "";
+      els.price.value = (product.price_pence / 100).toFixed(2);
+      els.gigPrice.value = product.gig_price_pence ? (product.gig_price_pence / 100).toFixed(2) : "";
+      els.sortOrder.value = product.sort_order || 0;
+      els.active.checked = product.active;
+
+      images = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
+      originalVariants = product.variants || [];
+      if (originalVariants.length > 0) {
+        originalVariants.forEach((v) => addVariantRow(v));
+      } else {
+        addSizeSet();
+      }
+    }
+  } else {
+    addSizeSet();
+  }
+
+  renderPhotoGrid();
+
+  document.getElementById("add-variant").addEventListener("click", () => addSizeSet());
 
   document.getElementById("photo-input").addEventListener("change", async (e) => {
     const files = Array.from(e.target.files || []);
