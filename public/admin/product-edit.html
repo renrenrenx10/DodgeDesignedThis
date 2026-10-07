@@ -53,6 +53,15 @@
   .upload-btn{display:inline-block; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px solid var(--ink); padding:10px 16px; cursor:pointer;}
   .upload-btn input{display:none;}
 
+  .ai-card{border-color:#000; background:#fafafa;}
+  .ai-card .ai-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .ai-card p.ai-note{font-size:11px; color:var(--mid); text-transform:none; letter-spacing:0; margin:0 0 16px; line-height:1.6;}
+  .ai-btn{font-weight:700; font-size:12px; letter-spacing:1px; text-transform:uppercase; padding:11px 20px; border:2px solid var(--ink); background:var(--ink); color:#fff; cursor:pointer; font-family:'Oswald',sans-serif; white-space:nowrap;}
+  .ai-btn:disabled{opacity:0.5; cursor:default;}
+  .ai-msg{font-size:11px; color:var(--mid); text-transform:none; margin-top:10px; min-height:14px;}
+  .ai-msg.err{color:#c0392b;}
+  .ai-msg.ok{color:#1e7e34;}
+
   .savebar{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;}
   .save-btn{font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; padding:14px 30px; border:2px solid var(--ink); background:var(--ink); color:#fff; cursor:pointer; font-family:'Oswald',sans-serif;}
   .save-btn:disabled{opacity:0.5; cursor:default;}
@@ -124,6 +133,20 @@
 
       <div class="grid2">
         <div>
+          <label for="seo-title">SEO Title</label>
+          <input id="seo-title" placeholder="Under 60 characters" maxlength="70" />
+        </div>
+        <div>
+          <label for="meta-description">Meta Description</label>
+          <input id="meta-description" placeholder="Under 155 characters" maxlength="170" />
+        </div>
+      </div>
+
+      <label for="tags">Tags</label>
+      <input id="tags" placeholder="comma, separated, tags" />
+
+      <div class="grid2">
+        <div>
           <label for="price">Price (£)</label>
           <input id="price" type="number" step="0.01" min="0" required />
         </div>
@@ -157,6 +180,17 @@
       <div class="field-note" style="margin-top:10px;">JPG, PNG or WEBP. Uploads need a saved product first — save the details above once, then add photos.</div>
     </div>
 
+    <div class="card ai-card">
+      <h2>AI Listing Helper</h2>
+      <p class="ai-note">Writes the blurb, SEO title, meta description, image alt text and tags in your voice, based on the main photo (the first one above) and whatever keywords you give it. It only fills in the fields below — nothing saves until you hit Save Product, so read it over first. Each run costs a fraction of a penny, billed to the Anthropic account behind this, separate from any Claude.ai subscription.</p>
+      <label for="ai-keywords">Keywords (the story, the joke, anything the photo won't tell it)</label>
+      <input id="ai-keywords" placeholder="e.g. GTFOD band tee, hand-drawn skull, yellow and black" />
+      <div class="ai-head">
+        <button type="button" class="ai-btn" id="ai-generate-btn">Generate from Main Photo</button>
+        <span class="ai-msg" id="ai-msg"></span>
+      </div>
+    </div>
+
     <div class="card">
       <h2>Sizes, Colours &amp; Stock</h2>
       <div id="variant-rows"></div>
@@ -187,6 +221,9 @@
     tag: document.getElementById("tag"),
     blurb: document.getElementById("blurb"),
     boilerplate: document.getElementById("boilerplate"),
+    seoTitle: document.getElementById("seo-title"),
+    metaDescription: document.getElementById("meta-description"),
+    tags: document.getElementById("tags"),
     price: document.getElementById("price"),
     gigPrice: document.getElementById("gig-price"),
     sortOrder: document.getElementById("sort-order"),
@@ -235,6 +272,9 @@
       els.tag.value = product.tag || "";
       els.blurb.value = product.blurb || "";
       els.boilerplate.value = product.boilerplate || "";
+      els.seoTitle.value = product.seo_title || "";
+      els.metaDescription.value = product.meta_description || "";
+      els.tags.value = product.tags || "";
       els.price.value = (product.price_pence / 100).toFixed(2);
       els.gigPrice.value = product.gig_price_pence ? (product.gig_price_pence / 100).toFixed(2) : "";
       els.sortOrder.value = product.sort_order || 0;
@@ -330,6 +370,59 @@
     renderPhotoGrid();
   });
 
+  document.getElementById("ai-generate-btn").addEventListener("click", async () => {
+    const aiMsg = document.getElementById("ai-msg");
+    const aiBtn = document.getElementById("ai-generate-btn");
+
+    if (images.length === 0) {
+      aiMsg.textContent = "Upload the main photo first — it's what the AI looks at.";
+      aiMsg.className = "ai-msg err";
+      return;
+    }
+    if (!els.title.value.trim()) {
+      aiMsg.textContent = "Give it a title first.";
+      aiMsg.className = "ai-msg err";
+      return;
+    }
+
+    aiBtn.disabled = true;
+    aiMsg.textContent = "Looking at the photo and writing…";
+    aiMsg.className = "ai-msg";
+
+    const { data, error } = await supabase.functions.invoke("generate-listing", {
+      body: {
+        image_url: images[0].url,
+        title: els.title.value.trim(),
+        category: els.category.value,
+        keywords: document.getElementById("ai-keywords").value,
+      },
+    });
+
+    aiBtn.disabled = false;
+
+    if (error || !data || data.error) {
+      aiMsg.textContent = `Couldn't generate: ${data?.error || error?.message || "unknown error"}`;
+      aiMsg.className = "ai-msg err";
+      return;
+    }
+
+    els.blurb.value = data.blurb || els.blurb.value;
+    els.seoTitle.value = data.seo_title || els.seoTitle.value;
+    els.metaDescription.value = data.meta_description || els.metaDescription.value;
+    els.tags.value = data.tags || els.tags.value;
+    // Only touch the slug if it's still empty — never silently change a
+    // slug that's already live and might be shared around.
+    if (!els.slug.value.trim() && data.slug) els.slug.value = data.slug;
+
+    if (data.alt_text && images[0]) {
+      images[0].alt = data.alt_text;
+      if (images[0].id) await supabase.from("product_images").update({ alt: data.alt_text }).eq("id", images[0].id);
+    }
+
+    aiMsg.textContent = "Done — have a read through before saving.";
+    aiMsg.className = "ai-msg ok";
+  });
+
   function renderPhotoGrid() {
     photoGrid.innerHTML = images
       .map(
@@ -364,6 +457,9 @@
       tag: els.tag.value.trim() || null,
       blurb: els.blurb.value.trim() || null,
       boilerplate: els.boilerplate.value.trim() || null,
+      seo_title: els.seoTitle.value.trim() || null,
+      meta_description: els.metaDescription.value.trim() || null,
+      tags: els.tags.value.trim() || null,
       price_pence: Math.round(parseFloat(els.price.value) * 100),
       gig_price_pence: els.gigPrice.value ? Math.round(parseFloat(els.gigPrice.value) * 100) : null,
       sort_order: parseInt(els.sortOrder.value, 10) || 0,
