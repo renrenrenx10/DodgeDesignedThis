@@ -42,7 +42,7 @@
   .checkrow label{margin:0;}
 
   .variant-row{display:grid; grid-template-columns:1fr 1fr 1fr 90px 36px; gap:10px; align-items:center; margin-bottom:10px;}
-  .variant-row input{margin-bottom:0;}
+  .variant-row input, .variant-row select{margin-bottom:0;}
   .variant-row .remove{width:36px; height:36px; border:2px solid var(--ink); background:#fff; cursor:pointer; font-weight:700; font-size:16px; line-height:1;}
   .addvariant{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px dashed var(--mid); background:none; padding:10px; width:100%; cursor:pointer; font-family:'Oswald',sans-serif; margin-top:6px;}
 
@@ -195,6 +195,22 @@
 
   let images = []; // { id?, url, alt, sort_order }
   let originalVariants = []; // variants as loaded, so we can tell what was removed
+
+  // The fixed colour palette Rene actually stocks — shown as a dropdown on
+  // each variant row instead of a free-text field. The two baseball-cap
+  // colourways are two-tone, so they get no swatch hex.
+  const COLOURS = [
+    { name: "Black", hex: "#000000" },
+    { name: "White", hex: "#ffffff" },
+    { name: "Yellow", hex: "#ffd400" },
+    { name: "Red", hex: "#d32f2f" },
+    { name: "Pink", hex: "#f48fb1" },
+    { name: "Blue", hex: "#1565c0" },
+    { name: "Green", hex: "#2e7d32" },
+    { name: "Grey", hex: "#9e9e9e" },
+    { name: "Red/White Baseball", hex: null },
+    { name: "Black/White Baseball", hex: null },
+  ];
   const variantRows = document.getElementById("variant-rows");
   const photoGrid = document.getElementById("photo-grid");
   const saveMsg = document.getElementById("save-msg");
@@ -236,17 +252,40 @@
   document.getElementById("add-variant").addEventListener("click", () => addVariantRow());
 
   function addVariantRow(variant) {
+    const currentColour = variant?.colour || "";
+    const knownNames = COLOURS.map((c) => c.name);
+    // If this row's existing colour isn't one of the fixed options (e.g. the
+    // "Default" placeholder from the old catalogue import), add it as an
+    // extra option so loading the page never silently changes the value —
+    // picking a real colour from the list is something Rene does on purpose.
+    const extraOption =
+      currentColour && !knownNames.includes(currentColour)
+        ? `<option value="${escapeAttr(currentColour)}" selected>${escapeAttr(currentColour)} (unset — pick one)</option>`
+        : "";
+
     const row = document.createElement("div");
     row.className = "variant-row";
     row.innerHTML = `
       <input placeholder="Size (e.g. M)" class="v-size" value="${escapeAttr(variant?.size)}" required />
-      <input placeholder="Colour (e.g. Black)" class="v-colour" value="${escapeAttr(variant?.colour)}" required />
+      <select class="v-colour" required>
+        <option value="" disabled ${currentColour ? "" : "selected"}>Choose colour…</option>
+        ${extraOption}
+        ${COLOURS.map(
+          (c) =>
+            `<option value="${c.name}" data-hex="${c.hex || ""}" ${currentColour === c.name ? "selected" : ""}>${c.name}</option>`,
+        ).join("")}
+      </select>
       <input placeholder="Colour Hex (#000)" class="v-hex" value="${escapeAttr(variant?.colour_hex)}" />
       <input type="number" min="0" step="1" placeholder="Stock" class="v-stock" value="${variant?.stock ?? 0}" required />
       <button type="button" class="remove" title="Remove">&times;</button>
     `;
     row.dataset.variantId = variant?.id || "";
     row.querySelector(".remove").addEventListener("click", () => row.remove());
+    row.querySelector(".v-colour").addEventListener("change", (e) => {
+      const opt = e.target.selectedOptions[0];
+      const hex = opt?.dataset.hex || "";
+      row.querySelector(".v-hex").value = hex;
+    });
     variantRows.appendChild(row);
   }
 
