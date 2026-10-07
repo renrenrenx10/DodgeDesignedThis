@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Update Stock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--grey); color:var(--ink); font-family:'Oswald',sans-serif; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 24px;}
+
+  header{background:#000; border-bottom:2px solid #000;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:16px 0; flex-wrap:wrap; gap:16px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand img{height:38px;}
+  .brand .tag{color:#fff; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;}
+  nav{display:flex; gap:22px; flex-wrap:wrap;}
+  nav a{font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#bbb; border-bottom:2px solid transparent; padding-bottom:2px;}
+  nav a.current{color:#fff; border-color:#fff;}
+  nav a:hover{color:#fff;}
+  .signout{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#bbb; border:1px solid #444; padding:6px 12px; background:none; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .signout:hover{color:#fff; border-color:#888;}
+
+  main{padding:40px 0 100px;}
+  .headrow{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:14px;}
+  h1{font-size:26px; text-transform:uppercase; letter-spacing:0.5px; margin:0;}
+  .subtitle{font-size:13px; color:var(--mid); text-transform:none; letter-spacing:0; margin:0 0 24px; max-width:620px; line-height:1.6;}
+
+  .filters{display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
+  .chip{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px solid var(--ink); padding:7px 14px; background:#fff; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .chip.active{background:var(--ink); color:#fff;}
+
+  .accordion{display:flex; flex-direction:column; gap:14px;}
+  .product-panel{background:#fff; border:2px solid var(--ink);}
+  .panel-head{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; cursor:pointer; gap:14px; flex-wrap:wrap;}
+  .panel-head .title{font-size:14px; font-weight:600; display:flex; align-items:center; gap:10px;}
+  .panel-head .total{font-size:11px; color:var(--mid); text-transform:none; letter-spacing:0;}
+  .panel-head .chevron{font-size:12px; color:var(--mid); transition:transform .15s ease;}
+  .product-panel.open .chevron{transform:rotate(180deg);}
+  .pill{display:inline-block; font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; padding:3px 8px; border:1px solid var(--c0392b, #c0392b); color:#c0392b;}
+
+  .panel-body{display:none; border-top:2px solid var(--ink); padding:16px 20px 20px;}
+  .product-panel.open .panel-body{display:block;}
+
+  .variant-grid{display:grid; grid-template-columns:1fr 1fr 130px; gap:10px 16px; align-items:center;}
+  .variant-grid .vh{font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--mid); padding-bottom:4px; border-bottom:1px solid #ddd;}
+  .variant-grid .vrow{display:contents;}
+  .variant-grid .vrow > div{padding:6px 0; font-size:13px; border-bottom:1px solid #f0f0f0;}
+  .stock-input{display:flex; align-items:center; gap:6px;}
+  .stock-input button{width:28px; height:28px; border:2px solid var(--ink); background:#fff; font-weight:700; cursor:pointer; font-size:14px; line-height:1;}
+  .stock-input input{width:52px; text-align:center; border:2px solid var(--ink); padding:5px 2px; font-family:'Oswald',sans-serif; font-size:13px;}
+  .stock-input input.dirty{border-color:#c0392b; background:#fff6f5;}
+
+  .savebar{position:fixed; left:0; right:0; bottom:0; background:#000; padding:16px 0; display:none; z-index:10;}
+  .savebar.show{display:block;}
+  .savebar .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px;}
+  .savebar .count{color:#fff; font-size:12px; text-transform:none; letter-spacing:0;}
+  .savebar button{font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; padding:12px 28px; border:2px solid #fff; background:#fff; color:#000; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .savebar button:disabled{opacity:0.5; cursor:default;}
+  .save-msg{color:#9f9; font-size:12px; text-transform:none;}
+  .save-msg.err{color:#f66;}
+
+  .loading, .empty{padding:24px; color:var(--mid); font-size:13px; text-transform:none;}
+
+  @media (max-width:640px){
+    .variant-grid{grid-template-columns:1fr 1fr 110px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><img src="../img/brand/logo.jpg" alt="Dodge Designed This" /><span class="tag">Admin</span></div>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="products.html">Products</a>
+      <a href="stock.html" class="current">Stock</a>
+      <a href="orders.html">Orders</a>
+      <a href="settings.html">Settings</a>
+      <a href="../index.html">View Shop</a>
+    </nav>
+    <button class="signout" id="signout-btn">Sign Out</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="headrow"><h1>Update Stock</h1></div>
+  <p class="subtitle">Every product, every size and colour, in one place — tap a product to open it, change a number, and hit Save Changes once you're done. Nothing saves until you press Save.</p>
+
+  <div class="filters" id="filters">
+    <button class="chip active" data-cat="all">All</button>
+    <button class="chip" data-cat="tees">Tees</button>
+    <button class="chip" data-cat="hoodies-sweats">Hoodies &amp; Sweats</button>
+    <button class="chip" data-cat="caps">Caps</button>
+    <button class="chip" data-cat="out-the-bin">Out The Bin</button>
+    <button class="chip" data-cat="band-print-bundles">Band Print Bundles</button>
+  </div>
+
+  <div class="accordion" id="accordion"><div class="loading">Loading…</div></div>
+</main>
+
+<div class="savebar" id="savebar">
+  <div class="wrap">
+    <span class="count" id="dirty-count">0 changes</span>
+    <button id="save-all-btn">Save Changes</button>
+    <span class="save-msg" id="save-msg"></span>
+  </div>
+</div>
+
+<script type="module">
+  import { requireSession, signOut } from "../assets/js/admin-auth.js";
+  import { supabase } from "../assets/js/supabase-client.js";
+
+  await requireSession();
+  document.getElementById("signout-btn").addEventListener("click", signOut);
+
+  const accordion = document.getElementById("accordion");
+  const savebar = document.getElementById("savebar");
+  const dirtyCount = document.getElementById("dirty-count");
+  const saveBtn = document.getElementById("save-all-btn");
+  const saveMsg = document.getElementById("save-msg");
+
+  // dirty[variantId] = new stock value
+  const dirty = new Map();
+
+  const { data: products, error } = await supabase
+    .from("products")
+    .select("id, title, category, active, sort_order, variants(id, size, colour, stock)")
+    .order("category", { ascending: true })
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    accordion.innerHTML = `<div class="empty">Couldn't load products: ${escapeHTML(error.message)}</div>`;
+  } else {
+    render(products, "all");
+  }
+
+  document.getElementById("filters").addEventListener("click", (e) => {
+    const btn = e.target.closest(".chip");
+    if (!btn) return;
+    document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+    btn.classList.add("active");
+    render(products, btn.dataset.cat);
+  });
+
+  function render(list, cat) {
+    const filtered = (cat === "all" ? list : list.filter((p) => p.category === cat)).filter(
+      (p) => (p.variants || []).length > 0,
+    );
+    if (filtered.length === 0) {
+      accordion.innerHTML = `<div class="empty">No products with sizes/stock in this category yet.</div>`;
+      return;
+    }
+
+    accordion.innerHTML = filtered.map((p) => panelHTML(p)).join("");
+
+    accordion.querySelectorAll(".panel-head").forEach((head) =>
+      head.addEventListener("click", () => head.closest(".product-panel").classList.toggle("open")),
+    );
+
+    accordion.querySelectorAll(".stock-input input").forEach((input) => {
+      input.addEventListener("input", () => onStockChange(input));
+    });
+    accordion.querySelectorAll(".stock-input button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const input = btn.parentElement.querySelector("input");
+        const delta = btn.dataset.delta === "+1" ? 1 : -1;
+        input.value = Math.max(0, (parseInt(input.value, 10) || 0) + delta);
+        onStockChange(input);
+      });
+    });
+  }
+
+  function panelHTML(p) {
+    const variants = p.variants || [];
+    const total = variants.reduce((s, v) => s + (v.stock || 0), 0);
+    const lowCount = variants.filter((v) => v.stock <= 2).length;
+    return `
+      <div class="product-panel">
+        <div class="panel-head">
+          <div class="title">
+            ${escapeHTML(p.title)}
+            ${lowCount > 0 ? `<span class="pill">${lowCount} low</span>` : ""}
+          </div>
+          <div class="total">${total} units total &nbsp; <span class="chevron">&#9660;</span></div>
+        </div>
+        <div class="panel-body">
+          <div class="variant-grid">
+            <div class="vh">Size</div><div class="vh">Colour</div><div class="vh">Stock</div>
+            ${variants
+              .map(
+                (v) => `
+              <div class="vrow">
+                <div>${escapeHTML(v.size)}</div>
+                <div>${escapeHTML(v.colour)}</div>
+                <div>
+                  <div class="stock-input">
+                    <button type="button" data-delta="-1">&minus;</button>
+                    <input type="number" min="0" step="1" value="${v.stock}" data-variant-id="${v.id}" data-original="${v.stock}" />
+                    <button type="button" data-delta="+1">+</button>
+                  </div>
+                </div>
+              </div>`,
+              )
+              .join("")}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function onStockChange(input) {
+    const id = input.dataset.variantId;
+    const original = Number(input.dataset.original);
+    const value = Math.max(0, parseInt(input.value, 10) || 0);
+    input.value = value;
+
+    if (value === original) {
+      dirty.delete(id);
+      input.classList.remove("dirty");
+    } else {
+      dirty.set(id, value);
+      input.classList.add("dirty");
+    }
+
+    updateSavebar();
+  }
+
+  function updateSavebar() {
+    if (dirty.size === 0) {
+      savebar.classList.remove("show");
+      return;
+    }
+    savebar.classList.add("show");
+    dirtyCount.textContent = `${dirty.size} change${dirty.size === 1 ? "" : "s"} unsaved`;
+    saveMsg.textContent = "";
+    saveMsg.className = "save-msg";
+  }
+
+  saveBtn.addEventListener("click", async () => {
+    if (dirty.size === 0) return;
+    saveBtn.disabled = true;
+    saveMsg.textContent = "Saving…";
+    saveMsg.className = "save-msg";
+
+    const updates = Array.from(dirty.entries());
+    let failed = 0;
+
+    for (const [id, stock] of updates) {
+      const { error: upErr } = await supabase.from("variants").update({ stock }).eq("id", id);
+      if (upErr) failed++;
+      else {
+        dirty.delete(id);
+        const input = accordion.querySelector(`input[data-variant-id="${id}"]`);
+        if (input) {
+          input.dataset.original = stock;
+          input.classList.remove("dirty");
+        }
+      }
+    }
+
+    saveBtn.disabled = false;
+
+    if (failed > 0) {
+      saveMsg.textContent = `${failed} update${failed === 1 ? "" : "s"} failed — try again.`;
+      saveMsg.className = "save-msg err";
+    } else {
+      saveMsg.textContent = "Saved.";
+    }
+    updateSavebar();
+    if (dirty.size === 0 && failed === 0) {
+      setTimeout(() => savebar.classList.remove("show"), 1600);
+    }
+  });
+
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str ?? "";
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>
