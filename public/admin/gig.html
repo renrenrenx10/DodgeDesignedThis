@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Gig Mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--grey); color:var(--ink); font-family:'Oswald',sans-serif; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  button{font-family:'Oswald',sans-serif;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 18px;}
+
+  header{background:#000; border-bottom:2px solid #000;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:14px 0; flex-wrap:wrap; gap:14px;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand img{height:34px;}
+  .brand .tag{color:#fff; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;}
+  nav{display:flex; gap:20px; flex-wrap:wrap;}
+  nav a{font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#bbb; border-bottom:2px solid transparent; padding-bottom:2px;}
+  nav a.current{color:#fff; border-color:#fff;}
+  nav a:hover{color:#fff;}
+  .signout{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#bbb; border:1px solid #444; padding:6px 12px; background:none; cursor:pointer;}
+  .signout:hover{color:#fff; border-color:#888;}
+
+  main{padding:20px 0 120px;}
+  h1{font-size:24px; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 4px;}
+  .subtitle{font-size:12px; color:var(--mid); text-transform:none; letter-spacing:0; margin:0 0 16px;}
+
+  /* Status strip: online/offline, queued count, tonight's tally */
+  .statusbar{display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fff; border:2px solid var(--ink); padding:12px 16px; margin-bottom:16px; flex-wrap:wrap;}
+  .status-left{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .net-pill{font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; border-radius:20px;}
+  .net-pill.online{background:#1e7e34; color:#fff;}
+  .net-pill.offline{background:#c0392b; color:#fff;}
+  .queued-pill{font-size:11px; color:var(--mid); text-transform:none;}
+  .queued-pill.has-queue{color:#c0392b; font-weight:700;}
+  .tally{font-size:14px; font-weight:700;}
+  .status-right{display:flex; gap:8px;}
+  .sb-btn{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px solid var(--ink); background:#fff; padding:8px 14px; cursor:pointer;}
+  .sb-btn:hover{background:var(--ink); color:#fff;}
+
+  .filters{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
+  .chip{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px solid var(--ink); padding:9px 16px; background:#fff; cursor:pointer;}
+  .chip.active{background:var(--ink); color:#fff;}
+
+  /* Step header shown once a product is picked */
+  .step-head{display:none; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px;}
+  .step-head.show{display:flex;}
+  .step-head .back{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; border:2px solid var(--ink); background:#fff; padding:10px 16px; cursor:pointer;}
+  .step-head .picked{font-size:14px; font-weight:600; text-align:right;}
+  .step-head .picked .sub{display:block; font-size:11px; color:var(--mid); text-transform:none; margin-top:2px;}
+
+  /* Big-button product grid */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px;}
+  .grid.hidden, .step-grid.hidden{display:none;}
+  .tile{background:#fff; border:2px solid var(--ink); cursor:pointer; padding:0; text-align:left; display:flex; flex-direction:column; min-height:170px;}
+  .tile:active{background:#f4f4f4;}
+  .tile .imgwrap{aspect-ratio:1/1; background:var(--grey); overflow:hidden;}
+  .tile .imgwrap img{width:100%; height:100%; object-fit:cover; display:block;}
+  .tile .imgwrap .ph{display:flex; align-items:center; justify-content:center; height:100%; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--mid); text-align:center; padding:8px;}
+  .tile .info{padding:10px 12px; flex:1; display:flex; flex-direction:column; justify-content:space-between;}
+  .tile .title{font-size:13px; font-weight:600; line-height:1.25;}
+  .tile .price{font-size:12px; color:var(--mid); margin-top:6px;}
+  .tile .price b{color:var(--ink);}
+
+  /* Size / colour step buttons — big tap targets */
+  .step-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:12px;}
+  .step-btn{min-height:76px; border:2px solid var(--ink); background:#fff; font-size:17px; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; text-transform:uppercase;}
+  .step-btn:active{background:var(--ink); color:#fff;}
+  .step-btn .swatch{width:20px; height:20px; border-radius:50%; border:2px solid var(--ink);}
+  .step-btn .n{font-size:10px; font-weight:600; color:var(--mid); text-transform:none;}
+  .step-btn:active .n{color:#ddd;}
+
+  .empty{padding:30px; text-align:center; color:var(--mid); font-size:13px; text-transform:none;}
+
+  /* Toast after logging a sale */
+  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:#000; color:#fff; padding:14px 18px; border-radius:6px; display:flex; align-items:center; gap:16px; opacity:0; transition:opacity .15s ease, transform .15s ease; z-index:50; max-width:90vw;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast .msg{font-size:13px;}
+  .toast .undo{font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#ffd400; background:none; border:none; cursor:pointer; white-space:nowrap;}
+
+  /* End-of-night summary overlay */
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:flex-start; justify-content:center; padding:40px 18px; z-index:60; overflow-y:auto;}
+  .overlay.show{display:flex;}
+  .summary-card{background:#fff; border:2px solid var(--ink); max-width:560px; width:100%; padding:28px;}
+  .summary-card h2{font-size:20px; text-transform:uppercase; margin:0 0 4px;}
+  .summary-card .totals{font-size:14px; margin-bottom:18px; color:var(--mid); text-transform:none;}
+  .summary-card .totals b{color:var(--ink);}
+  .summary-table{width:100%; border-collapse:collapse; font-size:13px; margin-bottom:20px;}
+  .summary-table th, .summary-table td{text-align:left; padding:8px 4px; border-bottom:1px solid #eee;}
+  .summary-table th{font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:var(--mid);}
+  .summary-actions{display:flex; justify-content:space-between; gap:12px;}
+  .summary-actions button{font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:12px 18px; border:2px solid var(--ink); background:#fff; cursor:pointer;}
+  .summary-actions .close-btn{background:var(--ink); color:#fff;}
+  .summary-actions .clear-btn{color:#c0392b; border-color:#c0392b;}
+
+  @media (max-width:480px){
+    .grid{grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));}
+    .tally{font-size:13px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><img src="../img/brand/logo.jpg" alt="Dodge Designed This" /><span class="tag">Admin</span></div>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="products.html">Products</a>
+      <a href="stock.html">Stock</a>
+      <a href="orders.html">Orders</a>
+      <a href="gig.html" class="current">Gig Mode</a>
+      <a href="settings.html">Settings</a>
+      <a href="../index.html">View Shop</a>
+    </nav>
+    <button class="signout" id="signout-btn">Sign Out</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Gig Mode</h1>
+  <p class="subtitle">Tap the item, tap the size, tap the colour — that's the sale logged at the gig price. Keep this tab open all night; it queues sales offline and syncs them the moment signal's back.</p>
+
+  <div class="statusbar">
+    <div class="status-left">
+      <span class="net-pill" id="net-pill">—</span>
+      <span class="queued-pill" id="queued-pill"></span>
+      <span class="tally" id="tally">Tonight: 0 sold · £0.00</span>
+    </div>
+    <div class="status-right">
+      <button class="sb-btn" id="sync-now-btn">Sync Now</button>
+      <button class="sb-btn" id="end-night-btn">End Night</button>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="chip active" data-cat="all">All</button>
+    <button class="chip" data-cat="tees">Tees</button>
+    <button class="chip" data-cat="hoodies-sweats">Hoodies &amp; Sweats</button>
+    <button class="chip" data-cat="caps">Caps</button>
+    <button class="chip" data-cat="out-the-bin">Out The Bin</button>
+    <button class="chip" data-cat="band-print-bundles">Band Print Bundles</button>
+  </div>
+
+  <div class="step-head" id="step-head">
+    <button class="back" id="step-back-btn">&larr; Back</button>
+    <div class="picked" id="step-picked"></div>
+  </div>
+
+  <div class="grid" id="product-grid"><div class="empty">Loading…</div></div>
+  <div class="step-grid hidden" id="size-grid"></div>
+  <div class="step-grid hidden" id="colour-grid"></div>
+</main>
+
+<div class="toast" id="toast">
+  <span class="msg" id="toast-msg"></span>
+  <button class="undo" id="toast-undo">Undo</button>
+</div>
+
+<div class="overlay" id="summary-overlay">
+  <div class="summary-card">
+    <h2>Tonight's Sales</h2>
+    <div class="totals" id="summary-totals"></div>
+    <table class="summary-table" id="summary-table"></table>
+    <div class="summary-actions">
+      <button class="clear-btn" id="summary-clear-btn">Clear Tonight's Tally</button>
+      <button class="close-btn" id="summary-close-btn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { requireSession, signOut } from "../assets/js/admin-auth.js";
+  import { supabase } from "../assets/js/supabase-client.js";
+  import { formatPrice, productImageHTML } from "../assets/js/shop.js";
+
+  await requireSession();
+  document.getElementById("signout-btn").addEventListener("click", signOut);
+
+  const SIZE_ORDER = ["One Size", "XS", "S", "M", "L", "XL", "2XL", "3XL"];
+  const QUEUE_KEY = "ddt_gig_queue_v1";
+
+  const productGrid = document.getElementById("product-grid");
+  const sizeGrid = document.getElementById("size-grid");
+  const colourGrid = document.getElementById("colour-grid");
+  const stepHead = document.getElementById("step-head");
+  const stepPicked = document.getElementById("step-picked");
+  const netPill = document.getElementById("net-pill");
+  const queuedPill = document.getElementById("queued-pill");
+  const tallyEl = document.getElementById("tally");
+  const toast = document.getElementById("toast");
+  const toastMsg = document.getElementById("toast-msg");
+  const toastUndo = document.getElementById("toast-undo");
+
+  // stockOverrides is the live, in-memory "what's actually left" number —
+  // it starts from what the server had at load and every tap here decrements
+  // it immediately, whether or not that tap has made it to Supabase yet.
+  // That's what lets Gig Mode stay accurate with zero signal all night.
+  const stockOverrides = new Map(); // variantId -> stock
+  let products = [];
+  let currentCategory = "all";
+  let currentProduct = null;
+  let currentSize = null;
+  let queue = loadQueue();
+  let toastTimer = null;
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("*, variants(*), product_images(*)")
+    .eq("active", true)
+    .order("category", { ascending: true })
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    productGrid.innerHTML = `<div class="empty">Couldn't load products — check your connection and reload. (${escapeHTML(error.message)})</div>`;
+  } else {
+    products = data || [];
+    products.forEach((p) => (p.variants || []).forEach((v) => stockOverrides.set(v.id, v.stock)));
+    renderProducts();
+  }
+
+  renderStatus();
+  flushQueue();
+
+  window.addEventListener("online", () => { renderStatus(); flushQueue(); });
+  window.addEventListener("offline", renderStatus);
+  setInterval(flushQueue, 20000);
+
+  document.getElementById("filters").addEventListener("click", (e) => {
+    const btn = e.target.closest(".chip");
+    if (!btn) return;
+    document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+    btn.classList.add("active");
+    currentCategory = btn.dataset.cat;
+    renderProducts();
+  });
+
+  document.getElementById("step-back-btn").addEventListener("click", () => {
+    if (!colourGrid.classList.contains("hidden")) {
+      // Back from colours to sizes
+      showSizeStep();
+    } else {
+      backToProducts();
+    }
+  });
+
+  document.getElementById("sync-now-btn").addEventListener("click", flushQueue);
+  document.getElementById("end-night-btn").addEventListener("click", showSummary);
+  document.getElementById("summary-close-btn").addEventListener("click", hideSummary);
+  document.getElementById("summary-clear-btn").addEventListener("click", () => {
+    if (!confirm("Clear tonight's tally? Sales already synced stay logged in Supabase — this only clears the running total shown here.")) return;
+    queue = [];
+    saveQueue();
+    renderStatus();
+    showSummary();
+  });
+
+  // ---------------------------------------------------------------------
+  // Product grid
+  // ---------------------------------------------------------------------
+
+  function effectiveStock(variant) {
+    return Math.max(0, stockOverrides.get(variant.id) ?? variant.stock ?? 0);
+  }
+
+  function sellableProducts() {
+    return products
+      .filter((p) => currentCategory === "all" || p.category === currentCategory)
+      .filter((p) => (p.variants || []).some((v) => effectiveStock(v) > 0));
+  }
+
+  function renderProducts() {
+    const list = sellableProducts();
+    if (list.length === 0) {
+      productGrid.innerHTML = `<div class="empty">Nothing in stock in this category right now.</div>`;
+      return;
+    }
+    productGrid.innerHTML = list
+      .map((p) => {
+        const gigPrice = p.gig_price_pence || p.price_pence;
+        return `
+      <button type="button" class="tile" data-id="${p.id}">
+        <div class="imgwrap">${productImageHTML(p)}</div>
+        <div class="info">
+          <div class="title">${escapeHTML(p.title)}</div>
+          <div class="price"><b>${formatPrice(gigPrice)}</b> gig</div>
+        </div>
+      </button>`;
+      })
+      .join("");
+    productGrid.querySelectorAll(".tile").forEach((tile) =>
+      tile.addEventListener("click", () => pickProduct(tile.dataset.id)),
+    );
+  }
+
+  function pickProduct(id) {
+    currentProduct = products.find((p) => p.id === id);
+    if (!currentProduct) return;
+    showSizeStep();
+  }
+
+  // ---------------------------------------------------------------------
+  // Size / colour steps
+  // ---------------------------------------------------------------------
+
+  function showSizeStep() {
+    currentSize = null;
+    productGrid.classList.add("hidden");
+    colourGrid.classList.add("hidden");
+    sizeGrid.classList.remove("hidden");
+    stepHead.classList.add("show");
+    stepPicked.innerHTML = `${escapeHTML(currentProduct.title)}<span class="sub">Choose a size</span>`;
+
+    const sizesInStock = SIZE_ORDER.filter((size) =>
+      (currentProduct.variants || []).some((v) => v.size === size && effectiveStock(v) > 0),
+    );
+
+    if (sizesInStock.length === 0) {
+      sizeGrid.innerHTML = `<div class="empty">Nothing left of this one.</div>`;
+      return;
+    }
+
+    sizeGrid.innerHTML = sizesInStock
+      .map((size) => `<button type="button" class="step-btn" data-size="${escapeAttr(size)}">${escapeHTML(size)}</button>`)
+      .join("");
+    sizeGrid.querySelectorAll(".step-btn").forEach((btn) =>
+      btn.addEventListener("click", () => pickSize(btn.dataset.size)),
+    );
+  }
+
+  function pickSize(size) {
+    currentSize = size;
+    showColourStep();
+  }
+
+  function showColourStep() {
+    sizeGrid.classList.add("hidden");
+    colourGrid.classList.remove("hidden");
+    stepPicked.innerHTML = `${escapeHTML(currentProduct.title)} — ${escapeHTML(currentSize)}<span class="sub">Choose a colour</span>`;
+
+    const variants = (currentProduct.variants || []).filter(
+      (v) => v.size === currentSize && effectiveStock(v) > 0,
+    );
+
+    if (variants.length === 0) {
+      colourGrid.innerHTML = `<div class="empty">Nothing left in this size.</div>`;
+      return;
+    }
+
+    colourGrid.innerHTML = variants
+      .map(
+        (v) => `
+      <button type="button" class="step-btn" data-variant-id="${v.id}">
+        ${v.colour_hex ? `<span class="swatch" style="background:${escapeAttr(v.colour_hex)};"></span>` : ""}
+        ${escapeHTML(v.colour)}
+        <span class="n">${effectiveStock(v)} left</span>
+      </button>`,
+      )
+      .join("");
+    colourGrid.querySelectorAll(".step-btn").forEach((btn) =>
+      btn.addEventListener("click", () => logSale(btn.dataset.variantId)),
+    );
+  }
+
+  function backToProducts() {
+    currentProduct = null;
+    currentSize = null;
+    stepHead.classList.remove("show");
+    sizeGrid.classList.add("hidden");
+    colourGrid.classList.add("hidden");
+    productGrid.classList.remove("hidden");
+    renderProducts();
+  }
+
+  // ---------------------------------------------------------------------
+  // Logging a sale — the 3rd tap. Decrements local stock straight away,
+  // queues the sale, tries to sync, shows an undo-able toast, then drops
+  // back to the product grid ready for the next sale.
+  // ---------------------------------------------------------------------
+
+  function logSale(variantId) {
+    const product = currentProduct;
+    const variant = (product.variants || []).find((v) => v.id === variantId);
+    if (!variant) return;
+
+    const current = effectiveStock(variant);
+    if (current <= 0) return; // stale tap, e.g. double-click
+    stockOverrides.set(variantId, current - 1);
+
+    const entry = {
+      localId: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      variantId,
+      productId: product.id,
+      productTitle: product.title,
+      size: variant.size,
+      colour: variant.colour,
+      pricePence: product.gig_price_pence || product.price_pence,
+      createdAt: new Date().toISOString(),
+      synced: false,
+      rowId: null,
+    };
+    queue.push(entry);
+    saveQueue();
+    renderStatus();
+
+    showToast(`Logged: ${product.title} — ${variant.size} / ${variant.colour} · ${formatPrice(entry.pricePence)}`, entry.localId);
+    backToProducts();
+    flushQueue();
+  }
+
+  function undoSale(localId) {
+    const idx = queue.findIndex((e) => e.localId === localId);
+    if (idx === -1) return;
+    const entry = queue[idx];
+
+    const restore = () => {
+      stockOverrides.set(entry.variantId, (stockOverrides.get(entry.variantId) ?? 0) + 1);
+      queue.splice(idx, 1);
+      saveQueue();
+      renderStatus();
+      renderProducts();
+      hideToast();
+    };
+
+    if (!entry.synced) {
+      restore();
+      return;
+    }
+
+    // Already landed in Supabase — undo the write too: delete the gig_sales
+    // row and give the stock back.
+    (async () => {
+      await supabase.from("gig_sales").delete().eq("id", entry.rowId);
+      const { data: v } = await supabase.from("variants").select("stock").eq("id", entry.variantId).single();
+      if (v) await supabase.from("variants").update({ stock: v.stock + 1 }).eq("id", entry.variantId);
+      restore();
+    })();
+  }
+
+  // ---------------------------------------------------------------------
+  // Offline queue + sync
+  // ---------------------------------------------------------------------
+
+  function loadQueue() {
+    try {
+      return JSON.parse(localStorage.getItem(QUEUE_KEY) || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  function saveQueue() {
+    try {
+      localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+    } catch {
+      // Storage full/unavailable — tally just won't survive a reload, sales already shown stand.
+    }
+  }
+
+  let flushing = false;
+  async function flushQueue() {
+    if (flushing || !navigator.onLine) return;
+    flushing = true;
+    try {
+      for (const entry of queue) {
+        if (entry.synced) continue;
+        try {
+          const { data: v, error: readErr } = await supabase
+            .from("variants")
+            .select("stock")
+            .eq("id", entry.variantId)
+            .single();
+          if (readErr) throw readErr;
+
+          const newStock = Math.max(0, (v?.stock ?? 0) - 1);
+          const { error: writeErr } = await supabase.from("variants").update({ stock: newStock }).eq("id", entry.variantId);
+          if (writeErr) throw writeErr;
+
+          const { data: saleRow, error: saleErr } = await supabase
+            .from("gig_sales")
+            .insert({ variant_id: entry.variantId, price_pence: entry.pricePence, created_at: entry.createdAt })
+            .select()
+            .single();
+          if (saleErr) throw saleErr;
+
+          entry.synced = true;
+          entry.rowId = saleRow.id;
+          saveQueue();
+        } catch (err) {
+          console.error("Gig sale sync failed, will retry:", err);
+          break; // stop here, retry the whole queue next pass rather than skipping ahead
+        }
+      }
+    } finally {
+      flushing = false;
+      renderStatus();
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // Status bar, toast, summary
+  // ---------------------------------------------------------------------
+
+  function renderStatus() {
+    const online = navigator.onLine;
+    netPill.textContent = online ? "Online" : "Offline";
+    netPill.className = `net-pill ${online ? "online" : "offline"}`;
+
+    const unsynced = queue.filter((e) => !e.synced).length;
+    queuedPill.textContent = unsynced > 0 ? `${unsynced} queued, not synced yet` : "all synced";
+    queuedPill.className = `queued-pill ${unsynced > 0 ? "has-queue" : ""}`;
+
+    const totalPence = queue.reduce((s, e) => s + e.pricePence, 0);
+    tallyEl.textContent = `Tonight: ${queue.length} sold · ${formatPrice(totalPence)}`;
+  }
+
+  function showToast(message, localId) {
+    clearTimeout(toastTimer);
+    toastMsg.textContent = message;
+    toastUndo.onclick = () => undoSale(localId);
+    toast.classList.add("show");
+    toastTimer = setTimeout(hideToast, 6000);
+  }
+
+  function hideToast() {
+    toast.classList.remove("show");
+  }
+
+  function showSummary() {
+    const totalPence = queue.reduce((s, e) => s + e.pricePence, 0);
+    const unsynced = queue.filter((e) => !e.synced).length;
+    document.getElementById("summary-totals").innerHTML =
+      `<b>${queue.length}</b> sold tonight · <b>${formatPrice(totalPence)}</b> total` +
+      (unsynced > 0 ? ` · ${unsynced} still queued to sync` : " · all synced");
+
+    const byLine = new Map(); // "title|||size|||colour" -> {title,size,colour,count,pence}
+    for (const e of queue) {
+      const key = `${e.productTitle}|||${e.size}|||${e.colour}`;
+      const line = byLine.get(key) || { title: e.productTitle, size: e.size, colour: e.colour, count: 0, pence: 0 };
+      line.count += 1;
+      line.pence += e.pricePence;
+      byLine.set(key, line);
+    }
+
+    const table = document.getElementById("summary-table");
+    if (byLine.size === 0) {
+      table.innerHTML = `<tr><td style="color:var(--mid); text-transform:none; padding:10px 0;">Nothing logged yet tonight.</td></tr>`;
+    } else {
+      table.innerHTML = `
+        <tr><th>Item</th><th>Qty</th><th>Total</th></tr>
+        ${Array.from(byLine.values())
+          .map(
+            (l) => `<tr><td>${escapeHTML(l.title)} — ${escapeHTML(l.size)} / ${escapeHTML(l.colour)}</td><td>${l.count}</td><td>${formatPrice(l.pence)}</td></tr>`,
+          )
+          .join("")}`;
+    }
+
+    document.getElementById("summary-overlay").classList.add("show");
+  }
+
+  function hideSummary() {
+    document.getElementById("summary-overlay").classList.remove("show");
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str ?? "";
+    return div.innerHTML;
+  }
+
+  function escapeAttr(str) {
+    return escapeHTML(str).replace(/"/g, "&quot;");
+  }
+</script>
+
+</body>
+</html>
