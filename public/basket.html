@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Basket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--paper); color:var(--ink); font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 24px;}
+  h1,h2,h3{font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.5px; margin:0;}
+
+  header{border-bottom:2px solid #000; background:#000;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:18px 0; flex-wrap:wrap; gap:16px;}
+  .brand img{height:46px; width:auto; display:block;}
+  nav{display:flex; gap:24px; flex-wrap:wrap;}
+  nav a{font-size:13.5px; font-weight:600; letter-spacing:0.5px; border-bottom:2px solid transparent; padding-bottom:2px; color:#fff;}
+  nav a:hover{border-color:#fff;}
+  .basket-link{font-size:12px; font-weight:600; letter-spacing:0.5px; color:#fff; display:flex; align-items:center; gap:7px;}
+  .basket-link:hover{border-bottom:2px solid #fff;}
+  .basket-count{background:#fff; color:#000; font-size:11px; font-weight:700; min-width:18px; height:18px; line-height:18px; border-radius:9px; display:inline-block; text-align:center; padding:0 5px;}
+  .basket-count.zero{opacity:0.45;}
+
+  main{padding:36px 0 80px;}
+  .headrow{display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:14px;}
+  h1{font-size:28px;}
+  .continue-link{font-size:11px; font-weight:700; letter-spacing:1px; text-decoration:underline;}
+
+  .empty-basket{text-transform:none; text-align:center; padding:60px 20px; border:2px dashed var(--mid); color:var(--mid);}
+  .empty-basket a{text-decoration:underline; color:var(--ink);}
+
+  .line{display:grid; grid-template-columns:90px 1fr auto auto auto; gap:16px; align-items:center; padding:18px 0; border-bottom:1px solid #e3e3e3;}
+  .line .imgwrap{width:90px; height:90px; background:var(--grey); overflow:hidden;}
+  .line .imgwrap img{width:100%; height:100%; object-fit:cover;}
+  .line .imgwrap .ph{display:flex; align-items:center; justify-content:center; height:100%; font-size:9px; font-weight:700; color:var(--mid); text-align:center; padding:4px;}
+  .line .info .title{font-size:14px; font-weight:600; text-transform:none; margin-bottom:4px;}
+  .line .info a{text-decoration:underline;}
+  .line .info .opts{font-size:11px; color:var(--mid); letter-spacing:0.5px;}
+  .line .info .unavailable{font-size:11px; color:#c0392b; letter-spacing:0.5px; text-transform:none; margin-top:4px;}
+  .line .qty{display:flex; align-items:center; border:2px solid var(--ink);}
+  .line .qty button{width:32px; height:32px; background:#fff; border:none; font-size:14px; font-weight:700; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .line .qty span{width:32px; text-align:center; font-weight:700; font-size:13px;}
+  .line .price{font-size:14px; font-weight:700; text-align:right; min-width:70px;}
+  .line .remove{font-size:10px; font-weight:700; letter-spacing:1px; color:var(--mid); background:none; border:none; cursor:pointer; text-decoration:underline; justify-self:end; text-transform:uppercase; font-family:'Oswald',sans-serif;}
+
+  .summary{margin-top:24px; display:flex; flex-direction:column; align-items:flex-end; gap:6px;}
+  .summary .row{display:flex; gap:24px; font-size:13px;}
+  .summary .row.total{font-size:18px; font-weight:700;}
+  .summary .note{font-size:11px; color:var(--mid); text-transform:none; max-width:360px; text-align:right; line-height:1.5;}
+
+  .checkout-btn{margin-top:18px; width:100%; font-weight:700; font-size:15px; padding:16px 20px; border:2px solid var(--ink); background:var(--ink); color:#fff; letter-spacing:0.5px; cursor:pointer; font-family:'Oswald',sans-serif;}
+  .checkout-btn:disabled{opacity:0.4; cursor:not-allowed;}
+  .checkout-msg{font-size:12px; color:#c0392b; text-transform:none; margin-top:10px; text-align:right;}
+
+  footer{background:var(--grey); border-top:2px solid var(--ink); padding:40px 0 30px; margin-top:60px;}
+  .footgrid{display:grid; grid-template-columns:1fr; gap:24px;}
+  .foot-links{display:grid; grid-template-columns:1fr 1fr; gap:30px; max-width:420px;}
+  .footgrid h4{font-size:13px; margin-bottom:12px;}
+  .footgrid p, .footgrid a{font-size:13px; line-height:1.8; display:block;}
+  .legal{margin-top:30px; font-size:11px; opacity:0.7; border-top:1px solid var(--ink); padding-top:16px;}
+
+  @media (max-width:640px){
+    .line{grid-template-columns:60px 1fr; grid-template-areas:"img info" "img qty" "img price"; row-gap:8px;}
+    .line .imgwrap{grid-area:img; width:60px; height:60px;}
+    .line .info{grid-area:info;}
+    .line .qty{grid-area:qty;}
+    .line .price{grid-area:price; text-align:left;}
+    .line .remove{grid-area:price; justify-self:end;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><a href="index.html"><img src="img/brand/logo.jpg" alt="Dodge Designed This" /></a></div>
+    <nav>
+      <a href="tees.html">Tees</a>
+      <a href="hoodies-sweats.html">Hoodies &amp; Sweats</a>
+      <a href="caps.html">Caps</a>
+      <a href="out-the-bin.html">Out The Bin</a>
+      <a href="band-print-bundles.html">Band Print Bundles</a>
+      <a href="about.html">About</a>
+    </nav>
+    <a class="basket-link" href="basket.html">Basket <span class="basket-count">0</span></a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="headrow">
+    <h1>Your Basket</h1>
+    <a class="continue-link" href="tees.html">&larr; Keep Shopping</a>
+  </div>
+
+  <div id="basket-root"><p style="text-transform:none;">Loading…</p></div>
+</main>
+
+<footer>
+  <div class="wrap footgrid">
+    <div class="brand">
+      <div>
+        <div class="word" style="font-weight:700; font-size:16px; color:#000;">Dodge Designed This</div>
+        <p style="margin:6px 0 0;">Live Fast — Print Hard.</p>
+      </div>
+    </div>
+    <div class="foot-links">
+      <div>
+        <h4>Shop</h4>
+        <a href="tees.html">Tees</a><a href="hoodies-sweats.html">Hoodies &amp; Sweats</a><a href="caps.html">Caps</a><a href="out-the-bin.html">Out The Bin</a><a href="band-print-bundles.html">Band Print Bundles</a>
+      </div>
+      <div>
+        <h4>Info</h4>
+        <a href="about.html">Delivery &amp; Returns</a><a href="about.html">Contact</a><a href="about.html">About</a>
+      </div>
+    </div>
+  </div>
+  <div class="wrap legal">© Dodge Designed This. All prints hand-pulled, all mistakes intentional-ish.</div>
+</footer>
+
+<script type="module">
+  import { supabase } from "./assets/js/supabase-client.js";
+  import { formatPrice } from "./assets/js/shop.js";
+  import { getCart, setQty, removeFromCart, checkoutCart } from "./assets/js/cart.js";
+
+  const root = document.getElementById("basket-root");
+
+  function esc(s) { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; }
+
+  async function load() {
+    const cart = getCart();
+    if (cart.length === 0) {
+      root.innerHTML = `<div class="empty-basket">Nothing in here yet. <a href="tees.html">Go pick something out.</a></div>`;
+      return;
+    }
+
+    const variantIds = cart.map((i) => i.variantId);
+    const { data: variants, error } = await supabase
+      .from("variants")
+      .select("id, size, colour, stock, product_id, products(id, title, slug, category, price_pence, active, product_images(url, alt, sort_order))")
+      .in("id", variantIds);
+
+    if (error) {
+      root.innerHTML = `<div class="empty-basket">Couldn't load your basket — try reloading. (${esc(error.message)})</div>`;
+      return;
+    }
+
+    // Build display lines, flagging anything that's vanished, gone
+    // inactive, or dropped below the quantity you'd put in — the basket
+    // itself is just what's in localStorage, so it can go stale between
+    // visits; this is the moment that gets caught and shown plainly rather
+    // than surfacing as a cryptic Stripe error at checkout.
+    const lines = cart.map((item) => {
+      const v = (variants || []).find((x) => x.id === item.variantId);
+      return { ...item, variant: v };
+    });
+
+    let subtotalPence = 0;
+    let hasUnavailable = false;
+
+    const rowsHTML = lines
+      .map((line) => {
+        const v = line.variant;
+        if (!v || !v.products || !v.products.active) {
+          hasUnavailable = true;
+          return `
+          <div class="line">
+            <div class="imgwrap"><div class="ph">Gone</div></div>
+            <div class="info">
+              <div class="title">No longer available</div>
+              <div class="unavailable">This one's been taken down — remove it to check out.</div>
+            </div>
+            <div></div>
+            <div></div>
+            <button type="button" class="remove" data-remove="${line.variantId}">Remove</button>
+          </div>`;
+        }
+
+        const product = v.products;
+        const qty = Math.min(line.qty, Math.max(v.stock, 0));
+        const outOfStock = v.stock <= 0;
+        const short = !outOfStock && qty < line.qty;
+        if (!outOfStock) subtotalPence += product.price_pence * qty;
+        else hasUnavailable = true;
+
+        const image = (product.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order)[0];
+        const imgHTML = image
+          ? `<img src="${esc(image.url)}" alt="${esc(image.alt || product.title)}" />`
+          : `<div class="ph">${esc(product.title)}</div>`;
+
+        return `
+        <div class="line">
+          <div class="imgwrap">${imgHTML}</div>
+          <div class="info">
+            <div class="title"><a href="product.html?slug=${encodeURIComponent(product.slug)}">${esc(product.title)}</a></div>
+            <div class="opts">${esc(v.size)} / ${esc(v.colour)}</div>
+            ${outOfStock ? `<div class="unavailable">Sold out — remove it to check out.</div>` : ""}
+            ${short ? `<div class="unavailable">Only ${v.stock} left — knocked your quantity down.</div>` : ""}
+          </div>
+          <div class="qty">
+            <button type="button" data-dec="${v.id}" ${outOfStock ? "disabled" : ""}>&minus;</button>
+            <span>${qty}</span>
+            <button type="button" data-inc="${v.id}" data-max="${v.stock}" ${outOfStock || qty >= v.stock ? "disabled" : ""}>+</button>
+          </div>
+          <div class="price">${formatPrice(product.price_pence * qty)}</div>
+          <button type="button" class="remove" data-remove="${v.id}">Remove</button>
+        </div>`;
+      })
+      .join("");
+
+    root.innerHTML = `
+      ${rowsHTML}
+      <div class="summary">
+        <div class="row total"><span>Subtotal</span><span>${formatPrice(subtotalPence)}</span></div>
+        <div class="note">Free UK postage, added at checkout. ${hasUnavailable ? "Sort out what's flagged above before you check out." : ""}</div>
+      </div>
+      <button type="button" class="checkout-btn" id="checkout-btn" ${hasUnavailable || subtotalPence === 0 ? "disabled" : ""}>Checkout</button>
+      <div class="checkout-msg" id="checkout-msg"></div>
+    `;
+
+    root.querySelectorAll("[data-dec]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const line = cart.find((i) => i.variantId === btn.dataset.dec);
+        setQty(btn.dataset.dec, Math.max(0, (line?.qty || 1) - 1));
+        load();
+      }),
+    );
+    root.querySelectorAll("[data-inc]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const line = cart.find((i) => i.variantId === btn.dataset.inc);
+        const max = Number(btn.dataset.max) || 0;
+        setQty(btn.dataset.inc, Math.min(max, (line?.qty || 0) + 1));
+        load();
+      }),
+    );
+    root.querySelectorAll("[data-remove]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        removeFromCart(btn.dataset.remove);
+        load();
+      }),
+    );
+
+    const checkoutBtn = document.getElementById("checkout-btn");
+    const checkoutMsg = document.getElementById("checkout-msg");
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener("click", async () => {
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = "Redirecting to checkout…";
+        checkoutMsg.textContent = "";
+        const result = await checkoutCart();
+        if (result.error) {
+          checkoutMsg.textContent = result.error;
+          checkoutBtn.disabled = false;
+          checkoutBtn.textContent = "Checkout";
+        }
+      });
+    }
+  }
+
+  load();
+</script>
+
+</body>
+</html>

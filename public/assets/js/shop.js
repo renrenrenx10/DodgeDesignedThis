@@ -73,8 +73,10 @@ function escapeHTML(str) {
   return div.innerHTML;
 }
 
-// Kicks off Stripe Checkout for a single variant + quantity. Redirects the
-// browser to Stripe's hosted checkout page on success.
+// Kicks off Stripe Checkout for a single variant + quantity, bypassing the
+// basket entirely. Not called anywhere anymore now product.html uses the
+// real basket (assets/js/cart.js) — left in case a one-tap buy path is
+// ever wanted again, since create-checkout-session itself didn't change.
 export async function buyNow(variantId, qty = 1) {
   const { data, error } = await supabase.functions.invoke("create-checkout-session", {
     body: { items: [{ variant_id: variantId, qty }] },

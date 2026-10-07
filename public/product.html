@@ -22,6 +22,10 @@
   nav{display:flex; gap:24px; flex-wrap:wrap;}
   nav a{font-size:13.5px; font-weight:600; letter-spacing:0.5px; border-bottom:2px solid transparent; padding-bottom:2px; color:#fff;}
   nav a:hover{border-color:#fff;}
+  .basket-link{font-size:12px; font-weight:600; letter-spacing:0.5px; color:#fff; display:flex; align-items:center; gap:7px;}
+  .basket-link:hover{border-bottom:2px solid #fff;}
+  .basket-count{background:#fff; color:#000; font-size:11px; font-weight:700; min-width:18px; height:18px; line-height:18px; border-radius:9px; display:inline-block; text-align:center; padding:0 5px;}
+  .basket-count.zero{opacity:0.45;}
 
   .crumb{padding:18px 0; font-size:11px; color:var(--mid); letter-spacing:1px;}
 
@@ -57,6 +61,8 @@
   .qty span{width:40px; text-align:center; font-weight:700; font-size:14px;}
   .btn-add{flex:1; font-weight:700; font-size:14px; padding:0 20px; border:2px solid var(--ink); background:var(--ink); color:#fff; letter-spacing:0.5px; cursor:pointer; display:flex; align-items:center; justify-content:center;}
   .btn-add:disabled{opacity:0.4; cursor:not-allowed;}
+  .add-msg{font-size:11px; color:var(--mid); text-transform:none; margin-top:10px; min-height:14px;}
+  .add-msg a{text-decoration:underline;}
 
   .pd-meta{border-top:1px solid var(--ink); margin-top:30px; padding-top:20px; display:flex; flex-direction:column; gap:14px;}
   .pd-meta .row{display:flex; gap:14px; align-items:baseline;}
@@ -86,6 +92,7 @@
       <a href="band-print-bundles.html">Band Print Bundles</a>
       <a href="about.html">About</a>
     </nav>
+    <a class="basket-link" href="basket.html">Basket <span class="basket-count">0</span></a>
   </div>
 </header>
 
@@ -118,7 +125,8 @@
 </footer>
 
 <script type="module">
-  import { getProductBySlug, formatPrice, buyNow } from "./assets/js/shop.js";
+  import { getProductBySlug, formatPrice } from "./assets/js/shop.js";
+  import { addToCart } from "./assets/js/cart.js";
 
   const params = new URLSearchParams(window.location.search);
   const slug = params.get('slug');
@@ -204,6 +212,7 @@
               </div>
               <button type="button" class="btn-add" id="buy-btn" disabled>Select a size</button>
             </div>
+            <div class="add-msg" id="add-msg"></div>
           </div>
 
           <div class="pd-meta">
@@ -222,6 +231,7 @@
       const thumbRow = document.getElementById('thumb-row');
       const buyBtn = document.getElementById('buy-btn');
       const qtyVal = document.getElementById('qty-val');
+      const addMsg = document.getElementById('add-msg');
 
       if (thumbRow) {
         thumbRow.querySelectorAll('button[data-idx]').forEach(btn => {
@@ -239,7 +249,7 @@
           return;
         }
         buyBtn.disabled = false;
-        buyBtn.textContent = 'Buy Now';
+        buyBtn.textContent = 'Add To Basket';
       }
 
       sizeRow.querySelectorAll('button:not([disabled])').forEach(btn => {
@@ -259,14 +269,20 @@
       });
 
       document.getElementById('qty-dec').addEventListener('click', () => { qty = Math.max(1, qty - 1); qtyVal.textContent = qty; });
-      document.getElementById('qty-inc').addEventListener('click', () => { qty = qty + 1; qtyVal.textContent = qty; });
+      document.getElementById('qty-inc').addEventListener('click', () => {
+        const v = variantFor(selectedSize, selectedColour);
+        const max = v ? v.stock : 99;
+        qty = Math.min(max, qty + 1);
+        qtyVal.textContent = qty;
+      });
 
       buyBtn.addEventListener('click', () => {
         const v = variantFor(selectedSize, selectedColour);
         if (!v) return;
-        buyBtn.disabled = true;
-        buyBtn.textContent = 'Redirecting to checkout…';
-        buyNow(v.id, qty);
+        addToCart(v.id, qty);
+        addMsg.innerHTML = `Added ${qty} to basket. <a href="basket.html">View Basket &rarr;</a>`;
+        qty = 1;
+        qtyVal.textContent = qty;
       });
 
       updateBuyBtn();

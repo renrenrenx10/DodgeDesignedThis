@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dodge Designed This — Order Placed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#0a0a0a; --paper:#ffffff; --grey:#eeeeee; --mid:#9a9a9a; }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--paper); color:var(--ink); font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.3px;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:900px; margin:0 auto; padding:0 24px;}
+  h1,h2{font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.5px; margin:0;}
+
+  header{border-bottom:2px solid #000; background:#000;}
+  .topbar{display:flex; align-items:center; justify-content:center; padding:18px 0;}
+  .brand img{height:46px; width:auto; display:block;}
+
+  main{padding:70px 0; text-align:center;}
+  .tick{font-size:48px; margin-bottom:18px;}
+  h1{font-size:28px; margin-bottom:14px;}
+  p{text-transform:none; font-size:14px; line-height:1.7; color:#444; max-width:440px; margin:0 auto 10px;}
+  .btn{display:inline-block; margin-top:26px; font-weight:700; font-size:13.5px; padding:14px 28px; border:2px solid var(--ink); background:var(--ink); color:#fff; letter-spacing:0.5px;}
+
+  footer{background:var(--grey); border-top:2px solid var(--ink); padding:24px 0; text-align:center;}
+  .legal{font-size:11px; opacity:0.7; text-transform:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><a href="index.html"><img src="img/brand/logo.jpg" alt="Dodge Designed This" /></a></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="tick">&#10003;</div>
+  <h1>Order Placed — Nice One</h1>
+  <p>Payment's gone through and we've got it. A confirmation's on its way to your inbox from Stripe; we'll be in touch if anything about delivery needs sorting.</p>
+  <p>This is one fella in a basement, not Amazon, so give it a little longer than you're used to.</p>
+  <a class="btn" href="index.html">Back To The Shop</a>
+</main>
+
+<footer>
+  <div class="wrap legal">© Dodge Designed This. All prints hand-pulled, all mistakes intentional-ish.</div>
+</footer>
+
+<script type="module">
+  // Reaching this page is only possible via Stripe's own success redirect
+  // (it's the success_url the checkout session was created with), so the
+  // basket that led here has definitely been paid for — clear it so it
+  // doesn't greet the customer with the same items next time they shop.
+  import { clearCart } from "./assets/js/cart.js";
+  clearCart();
+</script>
+
+</body>
+</html>
