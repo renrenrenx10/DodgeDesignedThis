@@ -35,6 +35,10 @@
   .cat-hero h1{font-size:36px; margin-bottom:12px;}
   .cat-hero .blurb{font-size:13px; line-height:1.7; color:#444; max-width:560px; text-transform:none; letter-spacing:0;}
 
+  .filters{display:flex; gap:10px; padding:20px 0 0; flex-wrap:wrap;}
+  .chip{font-size:11px; font-weight:700; letter-spacing:1px; border:2px solid var(--ink); padding:7px 14px; background:#fff; font-family:inherit; text-transform:inherit; cursor:pointer;}
+  .chip:hover{background:var(--grey);}
+  .chip.active{background:var(--ink); color:#fff;}
   .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:28px; padding:36px 0 60px;}
   .cat-grid .card{position:relative; display:block;}
   .cat-grid .imgwrap{aspect-ratio:1/1; background:var(--grey); overflow:hidden; margin-bottom:12px;}
@@ -82,6 +86,8 @@
   <p class="blurb">Hand screen-printed, one at a time, in a Sheffield basement. We rotate between different tee stocks, but nothing ever goes out under 150gsm — proper weight, not fast-fashion tissue paper. No two shirts are ever quite identical.</p>
 </section>
 
+<div class="wrap filters" id="size-filter"></div>
+
 <div class="wrap">
   <div class="cat-grid" id="tee-grid">
     <!-- populated from Supabase -->
@@ -111,17 +117,51 @@
 </footer>
 
 <script type="module">
-  import { getActiveProducts, productCardHTML } from "./assets/js/shop.js";
+  import { getActiveProducts, productCardHTML, getAvailableSizes, productHasSizeInStock } from "./assets/js/shop.js";
   import "./assets/js/cart.js";
 
   (async function(){
     const grid = document.getElementById('tee-grid');
+    const filterBar = document.getElementById('size-filter');
     const products = await getActiveProducts({ category: 'tees' });
+
     if (products.length === 0) {
       grid.innerHTML = '<p style="text-transform:none; font-size:13px; color:#777;">No tees live right now — check back soon.</p>';
       return;
     }
-    grid.innerHTML = products.map(p => productCardHTML(p)).join('');
+
+    let activeSize = null;
+
+    function render() {
+      const shown = activeSize
+        ? products.filter(p => productHasSizeInStock(p, activeSize))
+        : products;
+
+      grid.innerHTML = shown.length
+        ? shown.map(p => productCardHTML(p)).join('')
+        : '<p style="text-transform:none; font-size:13px; color:#777;">Nothing left in that size right now — try another, or check back soon.</p>';
+
+      filterBar.querySelectorAll('.chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.size === (activeSize || ''));
+      });
+    }
+
+    const sizes = getAvailableSizes(products);
+    if (sizes.length > 1) {
+      filterBar.innerHTML = [
+        '<button class="chip" data-size="">All Sizes</button>',
+        ...sizes.map(s => `<button class="chip" data-size="${s}">${s}</button>`),
+      ].join('');
+
+      filterBar.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        activeSize = chip.dataset.size || null;
+        render();
+      });
+    }
+
+    render();
   })();
 </script>
 

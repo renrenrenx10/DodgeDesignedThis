@@ -26,6 +26,34 @@ export async function getActiveProducts({ category, limit } = {}) {
   return data;
 }
 
+// Canonical size order for the filter chips — anything not in this list
+// (shouldn't happen, but just in case) is sorted alphabetically after it.
+const SIZE_ORDER = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "One Size"];
+
+// Every size that's actually in stock somewhere across these products,
+// in a sensible S→XL order rather than whatever order the DB returns.
+export function getAvailableSizes(products) {
+  const sizes = new Set();
+  for (const p of products) {
+    for (const v of (p.variants || [])) {
+      if (v.stock > 0) sizes.add(v.size);
+    }
+  }
+  return [...sizes].sort((a, b) => {
+    const ai = SIZE_ORDER.indexOf(a);
+    const bi = SIZE_ORDER.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+}
+
+// Does this product have the given size in stock, in any colour?
+export function productHasSizeInStock(product, size) {
+  return (product.variants || []).some((v) => v.size === size && v.stock > 0);
+}
+
 export async function getProductBySlug(slug) {
   const { data, error } = await supabase
     .from("products")
